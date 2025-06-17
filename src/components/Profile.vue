@@ -355,7 +355,7 @@
 <script setup>
 import { onMounted } from 'vue';
 
-const cloudfrontUrl = 'https://d123abcde.cloudfront.net/';
+const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 
 onMounted(() => {
   // --- Profile Edit Modal Functionality ---
