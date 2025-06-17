@@ -1,0 +1,9 @@
+html, body {
+  font-size: 16p !important;
+  zoom: 1 !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Amazon Ember', 'Segoe UI', sans-serif;
+  background: #f0f4f8;
+}
