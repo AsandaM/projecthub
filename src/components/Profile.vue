@@ -2,7 +2,7 @@
   <div>
     <div class="container-profile">
       <div class="profile-header">
-        <img :src="cloudfrontUrl" alt="Profile Avatar" id="mainProfileAvatar" />
+        <img :src="cloudfrontUrl + 'images/me.jpeg'" alt="Profile Avatar" id="mainProfileAvatar" />
         <div class="profile-info">
           <h1 id="profileName">Ethan Hector</h1>
           <p id="profileTitle">Cloud Support Engineer I</p>
