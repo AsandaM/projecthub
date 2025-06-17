@@ -1,7 +1,7 @@
 <template>
   <div class="container-main">
     <div class="Welcome">
-      <img src="/src/images/Jude Bellingham.png" alt="Profile Picture" class="profile-pic-welcome">
+      <img src="#" alt="Profile Picture" class="profile-pic-welcome">
       <h3 class="fw-bold">Welcome! <i class="fas fa-hand-sparkles text-warning"></i></h3>
       <p class="text-muted">Manage your projects and team efficiently.</p>
     </div>

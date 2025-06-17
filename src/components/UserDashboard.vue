@@ -175,7 +175,7 @@
       </div>
       <div class="right-column mt-5">
         <div class="profile-card">
-          <img src="/src/images/me.jpeg" alt="User Avatar">
+          <img :src="cloudfrontUrl + 'images/me.jpeg'" alt="User Avatar">
           <h3>Ethan Hector</h3>
           <p class="text-muted">Cloud Support Engineer I  | AWS Cloud Enthusiast</p>
           <router-link to="/profile" class="btn btn-outline-primary btn-sm btn-profile">View Full Profile</router-link>
@@ -255,6 +255,8 @@
 
 <script setup>
 import { onMounted, nextTick } from 'vue';
+
+const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 
 onMounted(() => {
   // --- Progress Bar Animation on Load ---
