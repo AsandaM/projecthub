@@ -27,7 +27,7 @@ export default {
 <style>
 html {
   font-size: 16px; /* Reset base font size */
-  zoom: 1; /* Ensure no browser zoom is inherited */
+  /* zoom: 1; Ensure no browser zoom is inherited */
 }
 
  * {
