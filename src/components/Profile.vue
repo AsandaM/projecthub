@@ -2,7 +2,7 @@
   <div>
     <div class="container-profile">
       <div class="profile-header">
-        <img src="/src/images/me.jpeg" alt="Profile Avatar" id="mainProfileAvatar" />
+        <img :src="cloudfrontUrl" alt="Profile Avatar" id="mainProfileAvatar" />
         <div class="profile-info">
           <h1 id="profileName">Ethan Hector</h1>
           <p id="profileTitle">Cloud Support Engineer I</p>
@@ -355,10 +355,7 @@
 <script setup>
 import { onMounted } from 'vue';
 
-// The following code is a direct conversion of your original JavaScript.
-// While functional, in a real Vue.js application, you would typically use
-// Vue's reactivity system (ref, reactive) and directives (v-model, v-for, v-if)
-// instead of direct DOM manipulation (`document.getElementById`, `innerHTML`, etc.).
+const cloudfrontUrl = 'https://d123abcde.cloudfront.net/';
 
 onMounted(() => {
   // --- Profile Edit Modal Functionality ---
