@@ -1,0 +1,12 @@
+{
+  "resourceName": "dynamoProjectHub",
+  "tableName": "dynamoProjectHub",
+  "partitionKey": {
+    "fieldName": "projectId",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": [
+    "dynamoProjectHubTriggere2cea973"
+  ]
+}

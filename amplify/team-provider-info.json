@@ -1,0 +1,37 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-backendprojecthub-dev-12907-authRole",
+      "UnauthRoleArn": "arn:aws:iam::280924795607:role/amplify-backendprojecthub-dev-12907-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::280924795607:role/amplify-backendprojecthub-dev-12907-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-backendprojecthub-dev-12907-deployment",
+      "UnauthRoleName": "amplify-backendprojecthub-dev-12907-unauthRole",
+      "StackName": "amplify-backendprojecthub-dev-12907",
+      "StackId": "arn:aws:cloudformation:us-east-1:280924795607:stack/amplify-backendprojecthub-dev-12907/bd9e45d0-4cea-11f0-bbbe-0e218d673041",
+      "AmplifyAppId": "d2wrew3exakjli",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-backendprojecthub-dev-12907-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "function": {
+        "dynamoProjectHubTriggere2cea973": {
+          "deploymentBucketName": "amplify-backendprojecthub-dev-12907-deployment",
+          "s3Key": "amplify-builds/dynamoProjectHubTriggere2cea973-353869744c7558695367-build.zip"
+        },
+        "apifunctiondynamo": {
+          "deploymentBucketName": "amplify-backendprojecthub-dev-12907-deployment",
+          "s3Key": "amplify-builds/apifunctiondynamo-6c51477255646a6f6432-build.zip"
+        }
+      },
+      "storage": {
+        "dynamoProjectHub": {}
+      },
+      "auth": {
+        "backendprojecthub": {}
+      },
+      "api": {
+        "apiProjecthub": {}
+      }
+    }
+  }
+}

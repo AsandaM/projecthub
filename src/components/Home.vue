@@ -44,22 +44,21 @@
 
             <h4 class="mt-5 fw-bold">Recommended Projects</h4>
             <div class="row mt-3">
-                <div class="col-md-4 mb-4">
+                <div v-for="project in recommendedProjects" :key="project.projectId" class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="fas fa-code"></i>
                         </div>
                         <div class="project-body">
-                            <h6 class="fw-bold">Web App Development</h6>
-                            <p>Build a web application using React and Node.js with real-time features and cloud
-                                integration.</p>
+                            <h6 class="fw-bold">{{ project.title }}</h6>
+                            <p>{{ project.description }}</p>
                             <router-link to="/project" class="btn btn-sm btn-light border"> View More</router-link>
                             <button class="btn btn-sm btn-orange float-end">Join</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
+                <!-- <div class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="fas fa-mobile-alt"></i>
@@ -72,9 +71,9 @@
                             <button class="btn btn-sm btn-orange float-end">Join</button>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
-                <div class="col-md-4 mb-4">
+                <!-- <div class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="fas fa-chart-bar"></i>
@@ -87,7 +86,7 @@
                             <button class="btn btn-sm btn-orange float-end">Join</button>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <div class="d-flex justify-content-between align-items-center">
@@ -95,22 +94,21 @@
                 <a href="#" class="text-orange fw-semibold">View All &gt;</a>
             </div>
             <div class="row mt-3">
-                <div class="col-md-4 mb-4">
+                <div v-for="project in exploreMoreProjects" :key="project.projectId" class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="fas fa-code"></i>
                         </div>
                         <div class="project-body">
-                            <h6 class="fw-bold">Web App Development</h6>
-                            <p>Build a web application using React and Node.js with real-time features and cloud
-                                integration.</p>
+                            <h6 class="fw-bold">{{ project.title }}</h6>
+                            <p>{{ project.description }}</p>
                             <router-link to="/project" class="btn btn-sm btn-light border"> View More</router-link>
                             <button class="btn btn-sm btn-orange float-end">Join</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4 mb-4">
+                <!-- <div class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
                             <i class="fas fa-mobile-alt"></i>
@@ -138,7 +136,7 @@
                             <button class="btn btn-sm btn-orange float-end">Join</button>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -146,10 +144,56 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import SkillsModal from './SkillsModal.vue';
 
+const cognitoDomain = import.meta.env.VITE_COGNITO_AUTHORITY; // or VITE_COGNITO_DOMAIN if that's what you use
+const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID;
+const oidcStorageKey = `oidc.user:${cognitoDomain}:${clientId}`;
+
 const showSkillsModal = ref(false);
+const projects = ref([]);
+
+const apiUrl = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/dev/items';
+
+// const projectIcons = ['↺', '❯❮', '📊', '💡', '🛠️', '🌐', '📱', '🔬', '🎨'];
+
+// Fetch projects from the API
+async function fetchProjects() {
+
+
+    console.log('OIDC Storage Key:', oidcStorageKey);
+    console.log('OIDC User:', sessionStorage.getItem(oidcStorageKey));
+
+     try {
+    const oidcUserRaw = sessionStorage.getItem(oidcStorageKey);
+    if (!oidcUserRaw) {
+      throw new Error('User is not authenticated');
+    }
+    const oidcUser = JSON.parse(oidcUserRaw);
+    const token = oidcUser && oidcUser.id_token;
+
+    if (!token) {
+      throw new Error('User is not authenticated');
+    }
+
+    const response = await fetch(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+        if (!response.ok) {
+        throw new Error('Failed to fetch projects: ' + response.statusText);
+        }
+        const data = await response.json();
+        console.log(data); // Handle the fetched data as needed
+        projects.value = data
+    } catch (error) {
+        console.error('Error fetching projects:', error);
+    }
+}
+
 
 onMounted(() => {
   // Only show the modal if it hasn't been shown yet for this user/session
@@ -157,11 +201,21 @@ onMounted(() => {
     showSkillsModal.value = true;
     localStorage.setItem('skillsModalShown', 'true');
   }
+ fetchProjects();
 }); 
 
 function closeSkillsModal() {
   showSkillsModal.value = false;
 }
+
+//show first 3 projects
+const recommendedProjects = computed(() => {
+  return projects.value.slice(0, 3);
+});
+
+const exploreMoreProjects = computed(() => {
+  return projects.value.slice(3, 9);
+});
 </script>
 
 <style scoped>

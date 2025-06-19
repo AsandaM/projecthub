@@ -1,0 +1,121 @@
+{
+  "api": {
+    "apiProjecthub": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "apifunctiondynamo"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "auth": {
+    "backendprojecthub": {
+      "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "serviceType": "managed"
+    }
+  },
+  "function": {
+    "apifunctiondynamo": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "dynamoProjectHub"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "dynamoProjectHubTriggere2cea973": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "dynamoProjectHub"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_apifunctiondynamo_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "apifunctiondynamo"
+        }
+      ]
+    },
+    "AMPLIFY_function_apifunctiondynamo_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "apifunctiondynamo"
+        }
+      ]
+    },
+    "AMPLIFY_function_dynamoProjectHubTriggere2cea973_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "dynamoProjectHubTriggere2cea973"
+        }
+      ]
+    },
+    "AMPLIFY_function_dynamoProjectHubTriggere2cea973_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "dynamoProjectHubTriggere2cea973"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "dynamoProjectHub": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    }
+  }
+}
