@@ -1,7 +1,7 @@
 <template>
   <div class="container-main">
     <div class="Welcome">
-      <img src="#" alt="Profile Picture" class="profile-pic-welcome">
+      <img :src="cloudfrontUrl + 'images/JudeBellingham.png'" class="profile-pic-welcome">
       <h3 class="fw-bold">Welcome! <i class="fas fa-hand-sparkles text-warning"></i></h3>
       <p class="text-muted">Manage your projects and team efficiently.</p>
     </div>
@@ -197,6 +197,9 @@
     </div>
   </div>
 </template>
+<script setup>
+const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
+</script>
 <style scoped>
 /* Main Content Container */
 .container-main {

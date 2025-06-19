@@ -1,4 +1,5 @@
 <template>
+    <SkillsModal v-if="showSkillsModal" @close="closeSkillsModal"/>
     <div class="home-page">
         <div class="container-main">
             <div class="search-bar">
@@ -145,7 +146,22 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import SkillsModal from './SkillsModal.vue';
 
+const showSkillsModal = ref(false);
+
+onMounted(() => {
+  // Only show the modal if it hasn't been shown yet for this user/session
+  if (!localStorage.getItem('skillsModalShown')) {
+    showSkillsModal.value = true;
+    localStorage.setItem('skillsModalShown', 'true');
+  }
+}); 
+
+function closeSkillsModal() {
+  showSkillsModal.value = false;
+}
 </script>
 
 <style scoped>

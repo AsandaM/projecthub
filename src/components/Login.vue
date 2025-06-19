@@ -7,11 +7,11 @@
     </nav>
     <div class="container hero">
       <div class="illustration-box">
-        <img src="../images/ProjectHub.png" alt="Project Hub Logo">
+        <img :src="cloudfrontUrl + 'images/projecthub-logo.png'" alt="Project Hub Logo" class="img-fluid">
       </div>
 
-      <h1 class="mb-2">Welcome to ProjectHub</h1>
-      <p class="mb-3 px-lg-4">Explore a growing list of exciting internal projects designed to match your skills and
+      <!-- <h1 class="mb-2">Welcome to ProjectHub</h1> -->
+      <p class="mb-3 px-lg-4">Explore a growing list of exciting internal projects <br> designed to match your skills and
         interests.</p>
 
       <p>Log in and find the project that's waiting for you.</p>
@@ -35,7 +35,7 @@
           <span>+5</span>
         </div>
         <div>
-          <small class="text-muted">Join 1,000+ collaborators already on the platform</small>
+          <small class="text-muted ms-2">Join 1,000+ collaborators already on the platform</small>
         </div>
       </div>
     </div>
@@ -47,6 +47,7 @@
 
 <script setup>
 import { userManager } from '../auth/oidc';
+const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 
 function signIn() {
   userManager.signinRedirect();
@@ -187,22 +188,22 @@ function ownerSignIn() {
 
 /* Illustration Box (mimics a card style from Profile5.html) */
 .illustration-box {
-  background: #f8f9fa;
+  /* background: #f8f9fa; */
   /* Light background from Profile5.html footer */
-  border-radius: 12px;
+  /* border-radius: 12px; */
   /* Adopt Profile5.html border-radius */
-  width: 80%;
+  width: 90%;
   /* Made width more flexible */
   max-width: 300px;
   /* Reduced max-width slightly */
-  height: 140px;
+  height: 200px;
   /* Reduced height */
   position: relative;
-  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.08);
+  /* box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.08); */
   /* More refined inner and outer shadow */
-  margin-bottom: 1.5rem;
+  /* margin-bottom: 1.5rem; */
   /* Reduced margin-bottom */
-  border: 1px solid #e9ecef;
+  /* border: 1px solid #e9ecef; */
   /* Light border for definition */
   display: flex;
   /* Use flexbox to center content */
@@ -216,9 +217,9 @@ function ownerSignIn() {
 
 /* Style for the image within the illustration-box */
 .illustration-box img {
-  max-width: 90%;
+  max-width: 100%;
   /* Give some padding within the box */
-  max-height: 90%;
+  max-height: 100%;
   /* Give some padding within the box */
   object-fit: contain;
   /* Ensure the entire image is visible within the box */

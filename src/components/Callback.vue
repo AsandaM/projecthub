@@ -15,7 +15,7 @@ const route = useRoute();
 onMounted(async () => {
   const user = await userManager.signinCallback();
   const claims = user.profile;
-  console.log('User claims:', claims);
+  // console.log('User claims:', claims);
   const groups = claims['cognito:groups'] || [];
 
   if (groups.includes('owner') || groups.includes('Admin')) {
