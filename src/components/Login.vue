@@ -54,7 +54,7 @@ function signIn() {
 }
 
 function ownerSignIn() {
-  userManager.signinRedirect({ state: { role: 'admin' } });
+  userManager.signinRedirect({ state: { target: '/projectOwner' } });
 }
 </script>
 
