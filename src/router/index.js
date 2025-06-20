@@ -50,7 +50,7 @@ const routes = [
     path: '/projectOwner',
     name: 'ProjectOwner',
     component: ProjectOwner,
-    meta: { requiresAuth: true, ownerOnly: true }
+    meta: { requiresAuth: true }
   },
   
 ];
@@ -67,14 +67,6 @@ router.beforeEach(async (to, from, next) => {
     if (!user || user.expired) {
       // Not logged in, redirect to login
       return next({ name: 'Login', query: { redirect: to.fullPath } });
-    }
-
-     // Owner/admin only protection
-    if (to.meta.ownerOnly) {
-      const groups = user.profile['cognito:groups'] || [];
-      if (!groups.includes('owner') && !groups.includes('Admin')) {
-        return next('/'); // Or redirect to a "not authorized" page
-      }
     }
   }
   next();
