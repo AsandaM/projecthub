@@ -145,7 +145,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="saveProfileChanges">Create Project</button>
+          <button type="button" class="btn btn-primary" id="saveProfileChanges" @click="createProject">Create Project</button>
         </div>
       </div>
     </div>
