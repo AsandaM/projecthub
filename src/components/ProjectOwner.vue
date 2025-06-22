@@ -222,6 +222,8 @@ const createProject = async () => {
     imageUrl: imageUrl.value,
   };
 
+console.log('Sending payload:', payload);
+
 fetch(API_URL, {
   method: 'POST',
   headers: {
@@ -229,9 +231,13 @@ fetch(API_URL, {
   },
   body: JSON.stringify(payload)
 })
-  .then(response => {
+.then(response => {
+  console.log('Response status:', response.status);
   if (!response.ok) {
-    return response.json().then(err => Promise.reject(err));
+    return response.json().then(err => {
+      console.log('Error response:', err);
+      return Promise.reject(err);
+    });
   }
   return response.json();
 })
