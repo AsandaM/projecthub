@@ -201,7 +201,7 @@
 import { ref } from 'vue';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
-const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create/createProject'; 
+const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
 
 const projectTitle = ref('');
 const projectDescription = ref('');
