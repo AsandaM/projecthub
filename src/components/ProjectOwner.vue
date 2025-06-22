@@ -264,6 +264,37 @@ const createProject = async () => {
 defineExpose({ createProject });
 </script>
 
+<script>
+  async function loadProjects() {
+    try {
+      const res = await fetch("https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/updateProject");
+      const projects = await res.json();
+
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = ""; // Clear current table
+
+      projects.forEach(project => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td data-label="Project Title">${project.title}</td>
+          <td data-label="Status">
+            <select class="form-select">
+              <option>Ongoing</option>
+              <option>Completed</option>
+            </select>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    } catch (err) {
+      console.error("Error loading projects:", err);
+    }
+  }
+
+  window.addEventListener("DOMContentLoaded", loadProjects);
+</script>
+
+
 
 
 
