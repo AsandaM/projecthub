@@ -198,7 +198,7 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'; 
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
@@ -206,47 +206,65 @@ const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/
 const projectTitle = ref('');
 const projectDescription = ref('');
 const projectDeadline = ref('');
-const projectBudget = ref('');
+const projectBudget = ref(0);
 const projectSkills = ref([]);
-const teamCapacity = ref('1');
+const teamCapacity = ref(1);
 const imageUrl = ref('');
 
 const createProject = async () => {
+  console.log('createProject function called');
+  
   const payload = {
-    title: projectTitle.value,
-    description: projectDescription.value,
-    deadline: projectDeadline.value,
-    budget: projectBudget.value,
-    skills: projectSkills.value,
-    teamCapacity: teamCapacity.value,
-    imageUrl: imageUrl.value,
+    title: document.getElementById('projectTitle').value,
+    description: document.getElementById('projectDescription').value,
+    deadline: document.getElementById('projectDeadline').value,
+    budget: document.getElementById('projectBudget').value,
+    skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
+    teamCapacity: document.getElementById('teamCapacity').value,
+    imageUrl: '', 
   };
+
+  console.log('Sending payload:', payload);
 
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify(payload)
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers));
+
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create project');
+      try {
+        const errorData = JSON.parse(responseText);
+        throw new Error(errorData.message || 'Failed to create project');
+      } catch (e) {
+        throw new Error(`Server returned ${response.status}: ${responseText}`);
+      }
     }
 
-    const data = await response.json();
+    const data = JSON.parse(responseText);
     console.log('Success:', data);
     alert('Project created successfully!');
     
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Detailed error:', error);
     alert('Failed to create project: ' + error.message);
   }
 };
-  
+
+defineExpose({ createProject });
 </script>
+
+
 
 
 <style scoped>
