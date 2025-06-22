@@ -116,6 +116,10 @@
     "dynamoProjectHub": {
       "providerPlugin": "awscloudformation",
       "service": "DynamoDB"
+    },
+    "usersProjectHub": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
     }
   }
 }

@@ -13,24 +13,24 @@
                             <a class="nav-link me-5" href="#" @click="signOut">Logout</a>
                         </template>
                         <template v-else>
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/">Home</router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/dashboard">My Dashboard</router-link>
-                        </li>
-                        <li class="nav-item">
-                            <router-link class="nav-link" to="/profile">Profile</router-link>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" id="signOut" @click="signOut">Logout</a>
-                        </li>
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/">Home</router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/dashboard">My Dashboard</router-link>
+                            </li>
+                            <li class="nav-item">
+                                <router-link class="nav-link" to="/profile">Profile</router-link>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="signOut" @click="signOut">Logout</a>
+                            </li>
                         </template>
                     </ul>
                 </div>
             </div>
         </nav>
-        
+
     </div>
 </template>
 <script setup>

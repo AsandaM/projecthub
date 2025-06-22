@@ -1,24 +1,32 @@
 <template>
   <main>
+    <Spinner v-if="loading" />
     <NavBar v-if="!hideNavAndFooter" />
     <router-view />
     <FooterComp v-if="!hideNavAndFooter" />
   </main>
 </template>
 <script>
-import { computed } from 'vue';
+import { computed, ref, provide } from 'vue';
 import { useRoute } from 'vue-router'
+import Spinner from './components/Spinner.vue';
 import NavBar from './components/NavBar.vue';
 import FooterComp from './components/FooterComp.vue';
 
 
 
 export default {
-  components: { NavBar, FooterComp },
+  components: { NavBar, FooterComp, Spinner },
   setup() {
     const route = useRoute();
+    const loading = ref(false);
+
+    provide('globalLoading', loading);
+    provide('setGlobalLoading', (value) => {
+      loading.value = value;
+    });
     const hideNavAndFooter = computed(() => route.name === 'Login');
-    return { hideNavAndFooter };
+    return { hideNavAndFooter, loading };
 
   }
 }

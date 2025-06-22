@@ -1,42 +1,29 @@
 <template>
-    <SkillsModal v-if="showSkillsModal" @close="closeSkillsModal"/>
+    <SkillsModal v-if="showSkillsModal" @close="closeSkillsModal" />
+    <Spinner v-if="loading" />
     <div class="home-page">
         <div class="container-main">
             <div class="search-bar">
                 <div class="row g-2">
                     <div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="Search projects...">
+                        <input type="text" class="form-control" placeholder="Search projects..." v-model="searchQuery">
                     </div>
                     <div class="col-md-2">
-                        <select class="form-select">
-                            <option>Location</option>
-                            <option>Caoe Town, South Africa</option>
-                            <option>Dublin, Ireland</option>
-                            <option>Nairobi, Kenya</option>
+                        <select class="form-select" v-model="selectedLocation">
+                            <option value="">Location</option>
+                            <option v-for="loc in locationOptions.slice(1)" :key="loc" :value="loc">{{ loc }}</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-select">
-                            <option>Domain</option>
-                            <option>Deployment</option>
-                            <option>Linux</option>
-                            <option>Windows</option>
-                            <option>Databases</option>
-                            <option>SCD</option>
-                            <option>Networking</option>
-                            <option>Big Data & AIML</option>
-                            <option>Analytics</option>
-                            <option>Security</option>
-                            <option>DMS</option>
+                        <select class="form-select" v-model="selectedDomain">
+                            <option value="">Domain</option>
+                            <option v-for="dom in domainOptions.slice(1)" :key="dom" :value="dom">{{ dom }}</option>
                         </select>
                     </div>
                     <div class="col-md-2">
-                        <select class="form-select">
-                            <option>Duration</option>
-                            <option>>1 Month</option>
-                            <option>1 Month</option>
-                            <option>2 Month</option>
-                            <option>3+ Month</option>
+                        <select class="form-select" v-model="selectedDuration">
+                            <option value="">Duration</option>
+                            <option v-for="dur in durationOptions.slice(1)" :key="dur" :value="dur">{{ dur }}</option>
                         </select>
                     </div>
                 </div>
@@ -44,49 +31,29 @@
 
             <h4 class="mt-5 fw-bold">Recommended Projects</h4>
             <div class="row mt-3">
-                <div v-for="project in recommendedProjects" :key="project.projectId" class="col-md-4 mb-4">
+                <div v-for="(project, index) in recommendedProjects" :key="project.projectId" class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
-                            <i class="fas fa-code"></i>
+                            <i :class="projectIcons[index % projectIcons.length]"></i>
                         </div>
                         <div class="project-body">
                             <h6 class="fw-bold">{{ project.title }}</h6>
                             <p>{{ project.description }}</p>
-                            <router-link to="/project" class="btn btn-sm btn-light border"> View More</router-link>
-                            <button class="btn btn-sm btn-orange float-end">Join</button>
+                            <router-link :to="`/project/object/${project.projectId}`"
+                                class="btn btn-sm btn-light border"> View More</router-link>
+                            <button class="btn btn-sm btn-orange float-end"
+                                :class="joinedProjects.includes(project.projectId) ? 'btn-secondary' : 'btn-orange'"
+                                @click.prevent="handleJoin(project.projectId)">
+                                {{ joinedProjects.includes(project.projectId) ? 'Joined' : 'Join' }}
+                            </button>
+                            <button class="btn btn-light border ms-2" @click.prevent="toggleBookmark(project.projectId)"
+                                :title="bookmarkedProjects.includes(project.projectId) ? 'Remove Bookmark' : 'Bookmark for later'">
+                                <i
+                                    :class="bookmarkedProjects.includes(project.projectId) ? 'fas fa-bookmark text-warning' : 'far fa-bookmark'"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- <div class="col-md-4 mb-4">
-                    <div class="project-card">
-                        <div class="project-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div class="project-body">
-                            <h6 class="fw-bold">Mobile App Design</h6>
-                            <p>Create intuitive and beautiful UI/UX designs for a health and wellness mobile
-                                application.</p>
-                            <button class="btn btn-sm btn-light border">View More</button>
-                            <button class="btn btn-sm btn-orange float-end">Join</button>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- <div class="col-md-4 mb-4">
-                    <div class="project-card">
-                        <div class="project-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="project-body">
-                            <h6 class="fw-bold">Data Analysis Project</h6>
-                            <p>Analyze customer behavior data and create insightful visualizations for a retail company.
-                            </p>
-                            <button class="btn btn-sm btn-light border">View More</button>
-                            <button class="btn btn-sm btn-orange float-end">Join</button>
-                        </div>
-                    </div>
-                </div> -->
             </div>
 
             <div class="d-flex justify-content-between align-items-center">
@@ -94,49 +61,29 @@
                 <a href="#" class="text-orange fw-semibold">View All &gt;</a>
             </div>
             <div class="row mt-3">
-                <div v-for="project in exploreMoreProjects" :key="project.projectId" class="col-md-4 mb-4">
+                <div v-for="(project, index) in exploreMoreProjects" :key="project.projectId" class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
-                            <i class="fas fa-code"></i>
+                            <i :class="projectIcon[index % projectIcon.length]"></i>
                         </div>
                         <div class="project-body">
                             <h6 class="fw-bold">{{ project.title }}</h6>
                             <p>{{ project.description }}</p>
-                            <router-link to="/project" class="btn btn-sm btn-light border"> View More</router-link>
-                            <button class="btn btn-sm btn-orange float-end">Join</button>
+                            <router-link :to="`/project/object/${project.projectId}`"
+                                class="btn btn-sm btn-light border"> View More</router-link>
+                            <button class="btn btn-sm btn-orange float-end"
+                                :class="joinedProjects.includes(project.projectId) ? 'btn-secondary' : 'btn-orange'"
+                                @click.prevent="handleJoin(project.projectId)">
+                                {{ joinedProjects.includes(project.projectId) ? 'Joined' : 'Join' }}
+                            </button>
+                            <button class="btn btn-light border ms-2" @click.prevent="toggleBookmark(project.projectId)"
+                                :title="bookmarkedProjects.includes(project.projectId) ? 'Remove Bookmark' : 'Bookmark for later'">
+                                <i
+                                    :class="bookmarkedProjects.includes(project.projectId) ? 'fas fa-bookmark text-warning' : 'far fa-bookmark'"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <!-- <div class="col-md-4 mb-4">
-                    <div class="project-card">
-                        <div class="project-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <div class="project-body">
-                            <h6 class="fw-bold">Mobile App Design</h6>
-                            <p>Create intuitive and beautiful UI/UX designs for a health and wellness mobile
-                                application.</p>
-                            <button class="btn btn-sm btn-light border">View More</button>
-                            <button class="btn btn-sm btn-orange float-end">Join</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4 mb-4">
-                    <div class="project-card">
-                        <div class="project-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="project-body">
-                            <h6 class="fw-bold">Data Analysis Project</h6>
-                            <p>Analyze customer behavior data and create insightful visualizations for a retail company.
-                            </p>
-                            <button class="btn btn-sm btn-light border">View More</button>
-                            <button class="btn btn-sm btn-orange float-end">Join</button>
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
 
@@ -146,80 +93,217 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import SkillsModal from './SkillsModal.vue';
+import Spinner from './Spinner.vue';
 
-const cognitoDomain = import.meta.env.VITE_COGNITO_AUTHORITY; // or VITE_COGNITO_DOMAIN if that's what you use
+const cognitoDomain = import.meta.env.VITE_COGNITO_AUTHORITY;
 const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID;
 const oidcStorageKey = `oidc.user:${cognitoDomain}:${clientId}`;
 
 const showSkillsModal = ref(false);
 const projects = ref([]);
+const loading = ref(true);
 
-const apiUrl = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/dev/items';
+const apiUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/dev/items';
+const PROJECTS_CACHE_KEY = 'cachedProjects';
+const JOINED_PROJECTS_KEY = 'joinedProjects';
+const joinedProjects = ref([]);
 
-// const projectIcons = ['↺', '❯❮', '📊', '💡', '🛠️', '🌐', '📱', '🔬', '🎨'];
+const BOOKMARKED_PROJECTS_KEY = 'bookmarkedProjects';
+const bookmarkedProjects = ref([]);
+
+const projectIcons = [
+    'fas fa-mobile-alt',
+    'fas fa-shopping-cart',
+    'fas fa-edit'
+];
+const projectIcon = [
+    'fas fa-mobile-alt',
+    'fas fa-code',
+    'fas fa-database',
+    'fas fa-cloud-sun',
+    'fas fa-list',
+    'fas fa-comment'
+];
+
+const searchQuery = ref('');
+const selectedLocation = ref('');
+const selectedDomain = ref('');
+const selectedDuration = ref('');
+
+// Filter options
+const locationOptions = [
+    '', 'Cape Town, South Africa', 'Dublin, Ireland', 'Nairobi, Kenya'
+];
+const domainOptions = [
+    '', 'Deployment', 'Linux', 'Windows', 'Databases', 'SCD', 'Networking', 'Big Data & AIML', 'Analytics', 'Security', 'DMS'
+];
+const durationOptions = [
+    '', '>1 Month', '1 Month', '2 Month', '3+ Month'
+];
+
+// Filtered projects computed
+const filteredProjects = computed(() => {
+    return projects.value.filter(project => {
+        // Search
+        const matchesSearch = !searchQuery.value ||
+            (project.title && project.title.toLowerCase().includes(searchQuery.value.toLowerCase())) ||
+            (project.description && project.description.toLowerCase().includes(searchQuery.value.toLowerCase()));
+        // Location
+        const matchesLocation = !selectedLocation.value || (project.location && project.location === selectedLocation.value);
+        // Domain
+        const matchesDomain = !selectedDomain.value || (project.domain && project.domain === selectedDomain.value);
+        // Duration
+        const matchesDuration = !selectedDuration.value || (project.duration && project.duration === selectedDuration.value);
+        return matchesSearch && matchesLocation && matchesDomain && matchesDuration;
+    });
+});
+
+// On mount: load cached projects first, then fetch from API
+onMounted(() => {
+    if (!localStorage.getItem('skillsModalShown')) {
+        showSkillsModal.value = true;
+        localStorage.setItem('skillsModalShown', 'true');
+    }
+
+    // Load cached projects from localStorage
+    const cached = localStorage.getItem(PROJECTS_CACHE_KEY);
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                projects.value = parsed;
+                loading.value = false; // Show projects instantly, no spinner
+            }
+        } catch (e) {
+            // Ignore parse errors, fallback to fetch
+        }
+    }
+    // If no cache, show spinner until fetch completes
+    if (!projects.value.length) {
+        loading.value = true;
+    }
+    fetchProjects();
+
+    // Load joined projects from localStorage
+    const joined = localStorage.getItem(JOINED_PROJECTS_KEY);
+    if (joined) {
+        try {
+            joinedProjects.value = JSON.parse(joined);
+        } catch (e) {
+            joinedProjects.value = [];
+        }
+    }
+
+    // Load bookmarked projects from localStorage
+    const bookmarked = localStorage.getItem(BOOKMARKED_PROJECTS_KEY);
+    if (bookmarked) {
+        try {
+            bookmarkedProjects.value = JSON.parse(bookmarked);
+        } catch (e) {
+            bookmarkedProjects.value = [];
+        }
+    }
+});
 
 // Fetch projects from the API
 async function fetchProjects() {
-
-
-    console.log('OIDC Storage Key:', oidcStorageKey);
-    console.log('OIDC User:', sessionStorage.getItem(oidcStorageKey));
-
-     try {
-    const oidcUserRaw = sessionStorage.getItem(oidcStorageKey);
-    if (!oidcUserRaw) {
-      throw new Error('User is not authenticated');
+    // Only show spinner if no cached projects
+    if (!projects.value.length) {
+        loading.value = true;
     }
-    const oidcUser = JSON.parse(oidcUserRaw);
-    const token = oidcUser && oidcUser.id_token;
-
-    if (!token) {
-      throw new Error('User is not authenticated');
-    }
-
-    const response = await fetch(apiUrl, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-        if (!response.ok) {
-        throw new Error('Failed to fetch projects: ' + response.statusText);
+    try {
+        const oidcUserRaw = sessionStorage.getItem(oidcStorageKey);
+        if (!oidcUserRaw) {
+            throw new Error('User is not authenticated');
         }
-        const data = await response.json();
-        console.log(data); // Handle the fetched data as needed
-        projects.value = data
+        const oidcUser = JSON.parse(oidcUserRaw);
+        const token = oidcUser && oidcUser.id_token;
+        if (!token) {
+            throw new Error('User is not authenticated');
+        }
+        const response = await fetch(apiUrl, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        let data = [];
+        if (response.status === 200) {
+            data = await response.json();
+            projects.value = data;
+            // Update cache
+            localStorage.setItem(PROJECTS_CACHE_KEY, JSON.stringify(data));
+        } else if (response.status === 304) {
+            // No new data, keep cached projects
+            console.log('No new projects found, using cached data');
+            // Do not update projects.value or cache
+        }
+        if (!response.ok && response.status !== 304) {
+            throw new Error('Failed to fetch projects: ' + response.statusText);
+        }
     } catch (error) {
         console.error('Error fetching projects:', error);
+    } finally {
+        loading.value = false;
     }
 }
 
-
-onMounted(() => {
-  // Only show the modal if it hasn't been shown yet for this user/session
-  if (!localStorage.getItem('skillsModalShown')) {
-    showSkillsModal.value = true;
-    localStorage.setItem('skillsModalShown', 'true');
-  }
- fetchProjects();
-}); 
-
 function closeSkillsModal() {
-  showSkillsModal.value = false;
+    showSkillsModal.value = false;
 }
 
-//show first 3 projects
 const recommendedProjects = computed(() => {
-  return projects.value.slice(0, 3);
+    return filteredProjects.value.slice(0, 3);
 });
 
 const exploreMoreProjects = computed(() => {
-  return projects.value.slice(3, 9);
+    return filteredProjects.value.slice(3, 9);
 });
+
+function handleJoin(projectId) {
+    if (joinedProjects.value.includes(projectId)) {
+        showAlert('You already joined this project. Check your dashboard for updates.', 'info');
+        return;
+    }
+    joinedProjects.value.push(projectId);
+    localStorage.setItem(JOINED_PROJECTS_KEY, JSON.stringify(joinedProjects.value));
+    showAlert('Join request sent! Check your dashboard for updates.', 'success');
+}
+
+function showAlert(message, type = 'success') {
+    // Remove any existing alert
+    const oldAlert = document.getElementById('home-alert');
+    if (oldAlert) oldAlert.remove();
+    const alertDiv = document.createElement('div');
+    alertDiv.id = 'home-alert';
+    alertDiv.className = `alert alert-${type === 'info' ? 'info' : type === 'error' ? 'danger' : 'success'} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.bottom = '30px';
+    alertDiv.style.right = '30px';
+    alertDiv.style.zIndex = 1055;
+    alertDiv.innerHTML = `
+    <span>${message}</span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
+    document.body.appendChild(alertDiv);
+    setTimeout(() => {
+        if (alertDiv) alertDiv.classList.remove('show');
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 3000);
+}
+
+function toggleBookmark(projectId) {
+    const idx = bookmarkedProjects.value.indexOf(projectId);
+    if (idx === -1) {
+        bookmarkedProjects.value.push(projectId);
+    } else {
+        bookmarkedProjects.value.splice(idx, 1);
+    }
+    localStorage.setItem(BOOKMARKED_PROJECTS_KEY, JSON.stringify(bookmarkedProjects.value));
+}
 </script>
 
 <style scoped>
-
 /* Container for Main Content - Adapted from Profile5.html's container-profile */
 .container-main {
     max-width: 1200px;

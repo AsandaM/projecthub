@@ -13,6 +13,19 @@
           "delete"
         ]
       }
+    },
+    "/users": {
+      "name": "/users",
+      "lambdaFunction": "apifunctiondynamo",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
     }
   }
 }

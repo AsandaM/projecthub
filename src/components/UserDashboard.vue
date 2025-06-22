@@ -127,7 +127,7 @@
           </div>
         </div>
         <div class="section">
-          <h1 class="mt-5 fw-bold">Trending Projects</h1>
+          <h1 class="mt-5 fw-bold">Bookmarked Projects</h1>
           <div class="row mt-3">
             <div class="col-md-4">
               <div class="project-item">
@@ -177,7 +177,7 @@
         <div class="profile-card">
           <img :src="cloudfrontUrl + 'images/me.jpeg'" alt="User Avatar">
           <h3>Ethan Hector</h3>
-          <p class="text-muted">Cloud Support Engineer I  | AWS Cloud Enthusiast</p>
+          <p class="text-muted">Cloud Support Engineer I | AWS Cloud Enthusiast</p>
           <router-link to="/profile" class="btn btn-outline-primary btn-sm btn-profile">View Full Profile</router-link>
 
           <div class="activity-section">

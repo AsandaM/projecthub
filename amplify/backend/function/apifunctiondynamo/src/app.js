@@ -38,11 +38,18 @@ const app = express()
 app.use(bodyParser.json())
 app.use(awsServerlessExpressMiddleware.eventContext())
 
-// Enable CORS for all methods
+// Enable CORS for all methods and handle preflight OPTIONS
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", "*")
-  next()
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  next();
+});
+app.options('*', function(req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.sendStatus(200);
 });
 
 // convert url string param to expected Type
@@ -55,11 +62,14 @@ const convertUrlType = (param, type) => {
   }
 }
 
+const usersTableName = "usersProjectHub" + (process.env.ENV && process.env.ENV !== "NONE" ? '-' + process.env.ENV : '');
+
 /************************************
 * HTTP Get method to list objects *
 ************************************/
 
 app.get(path, async function(req, res) {
+  res.setHeader('Cache-control', 'public, max-age=300'); // Cache for 5 minutes
   var params = {
     TableName: tableName,
     Select: 'ALL_ATTRIBUTES',
@@ -79,6 +89,7 @@ app.get(path, async function(req, res) {
  ************************************/
 
 app.get(path + hashKeyPath, async function(req, res) {
+  res.setHeader('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
   const condition = {}
   condition[partitionKeyName] = {
     ComparisonOperator: 'EQ'
@@ -114,6 +125,7 @@ app.get(path + hashKeyPath, async function(req, res) {
  *****************************************/
 
 app.get(path + '/object' + hashKeyPath + sortKeyPath, async function(req, res) {
+  res.setHeader('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
   const params = {};
   if (userIdPresent && req.apiGateway) {
     params[partitionKeyName] = req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -242,6 +254,51 @@ app.delete(path + '/object' + hashKeyPath + sortKeyPath, async function(req, res
 
 app.listen(3000, function() {
   console.log("App started")
+});
+
+//update user table 
+// Update user skills
+app.post('/users/:userId/skills', async function(req, res) {
+  const userId = req.params.userId;
+  const { skills, name, email, bio, job_title, location, phone  } = req.body;
+
+  if (!Array.isArray(skills)) {
+    res.statusCode = 400;
+    return res.json({ error: 'Skills must be an array.' });
+  }
+
+  try {
+    await ddbDocClient.send(new PutCommand({
+      TableName: usersTableName,
+      Item: { userId, skills, name, email, bio, job_title, location, phone }
+    }));
+    res.json({ success: true });
+  } catch (err) {
+    res.statusCode = 500;
+    res.json({ error: err.message });
+  }
+});
+
+// Get user skills
+app.get('/users/:userId/skills', async function(req, res) {
+  res.setHeader('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
+  const userId = req.params.userId;
+  try {
+    const data = await ddbDocClient.send(new GetCommand({
+      TableName: usersTableName,
+      Key: { userId }
+    }));
+    res.json(data.Item || {});
+  } catch (err) {
+    res.statusCode = 500;
+    res.json({ error: err.message });
+  }
+});
+
+//Error handler 
+app.use((err, req, res, next) => {
+  console.error('Express error:', err);
+  res.status(500).json({ error: err.message || 'Internal Server Error' });
 });
 
 // Export the app object. When executing the application local this does nothing. However,

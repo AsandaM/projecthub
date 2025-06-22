@@ -20,11 +20,12 @@
         },
         "apifunctiondynamo": {
           "deploymentBucketName": "amplify-backendprojecthub-dev-12907-deployment",
-          "s3Key": "amplify-builds/apifunctiondynamo-6c51477255646a6f6432-build.zip"
+          "s3Key": "amplify-builds/apifunctiondynamo-5a4c4678336368693141-build.zip"
         }
       },
       "storage": {
-        "dynamoProjectHub": {}
+        "dynamoProjectHub": {},
+        "usersProjectHub": {}
       },
       "auth": {
         "backendprojecthub": {}

@@ -41,6 +41,14 @@ export type AmplifyDependentResourcesAttributes = {
       "PartitionKeyType": "string",
       "Region": "string",
       "StreamArn": "string"
+    },
+    "usersProjectHub": {
+      "Arn": "string",
+      "Name": "string",
+      "PartitionKeyName": "string",
+      "PartitionKeyType": "string",
+      "Region": "string",
+      "StreamArn": "string"
     }
   }
 }

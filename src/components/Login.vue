@@ -11,7 +11,8 @@
       </div>
 
       <!-- <h1 class="mb-2">Welcome to ProjectHub</h1> -->
-      <p class="mb-3 px-lg-4">Explore a growing list of exciting internal projects <br> designed to match your skills and
+      <p class="mb-3 px-lg-4">Explore a growing list of exciting internal projects <br> designed to match your skills
+        and
         interests.</p>
 
       <p>Log in and find the project that's waiting for you.</p>
@@ -54,12 +55,19 @@ function signIn() {
 }
 
 function ownerSignIn() {
-  userManager.signinRedirect({ state: { role: 'admin' } });
+  userManager.signinRedirect({ state: { target: '/projectOwner' } });
 }
 </script>
 
 <style scoped>
 /* Navigation Styles (from Profile5.html) */
+vertical-hero-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* Ensures footer is at the bottom */
+}
+
 .navbar {
   background-color: #232f3e;
   /* AWS Dark Blue */
@@ -108,8 +116,10 @@ function ownerSignIn() {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   /* Slightly stronger shadow for main content */
   max-width: 800px;
+  /* height: 100%; */
   /* Constrain width for better appearance */
-  margin: 30px auto;
+  /* margin: 30px auto; */
+  margin-top: 6px;
   /* Reduced top/bottom margin */
   flex-grow: 1;
   /* Allows content to push footer down */
