@@ -145,7 +145,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="saveProfileChanges">Create Project</button>
+          <button type="button" class="btn btn-primary" id="saveProfileChanges" @click="createProject">Create Project</button>
         </div>
       </div>
     </div>
@@ -198,8 +198,57 @@
   </div>
 </template>
 <script setup>
+import { ref } from 'vue';
+
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
+const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
+
+const projectTitle = ref('');
+const projectDescription = ref('');
+const projectDeadline = ref('');
+const projectBudget = ref('');
+const projectSkills = ref([]);
+const teamCapacity = ref('1');
+const imageUrl = ref('');
+
+const createProject = async () => {
+  const payload = {
+    title: projectTitle.value,
+    description: projectDescription.value,
+    deadline: projectDeadline.value,
+    budget: projectBudget.value,
+    skills: projectSkills.value,
+    teamCapacity: teamCapacity.value,
+    imageUrl: imageUrl.value,
+  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create project');
+    }
+
+    const data = await response.json();
+    console.log('Success:', data);
+    alert('Project created successfully!');
+    
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to create project: ' + error.message);
+  }
+};
+  
 </script>
+
+
 <style scoped>
 /* Main Content Container */
 .container-main {
