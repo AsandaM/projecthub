@@ -197,19 +197,22 @@
     </div>
   </div>
 </template>
-<script setup>
-const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
-  import {ref} from'vue';
-  const projectTitle = ref('');
-  const projectDescription = ref('');
-  const projectDeadline = ref('');
-  const projectBudget = ref('');
-  const projectSkills = ref([]);
-  const teamCapacity = ref('1');
-  const imageUrl = ref('');
-  const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create/createProject';
 
-    const createProject = async () => {
+<script setup>
+import { ref } from 'vue';
+
+const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
+const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create/createProject';
+
+const projectTitle = ref('');
+const projectDescription = ref('');
+const projectDeadline = ref('');
+const projectBudget = ref('');
+const projectSkills = ref([]);
+const teamCapacity = ref('1');
+const imageUrl = ref('');
+
+const createProject = async () => {
   const payload = {
     title: projectTitle.value,
     description: projectDescription.value,
@@ -219,18 +222,21 @@ const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
     teamCapacity: teamCapacity.value,
     imageUrl: imageUrl.value,
   };
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error('Network error');
-      alert('Project created!');
-    } catch (error) {
-      alert('Failed to create project: ' + error.message);
-    }
-  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, 
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) throw new Error('Network error');
+
+    alert('Project created!');
+  } catch (error) {
+    alert('Failed to create project: ' + error.message);
+  }
+};
 </script>
 
 <style scoped>
