@@ -222,28 +222,29 @@ const createProject = async () => {
     imageUrl: imageUrl.value,
   };
 
-console.log('Sending payload:', payload);
-
-fetch(API_URL, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(payload)
-})
-.then(response => {
-  console.log('Response status:', response.status);
-  if (!response.ok) {
-    return response.json().then(err => {
-      console.log('Error response:', err);
-      return Promise.reject(err);
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
-  }
-  return response.json();
-})
-.then(data => console.log('Success:', data))
-.catch(error => console.error('Error:', error));
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create project');
+    }
+
+    const data = await response.json();
+    console.log('Success:', data);
+    alert('Project created successfully!');
+    
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Failed to create project: ' + error.message);
+  }
+};
   
 </script>
 
