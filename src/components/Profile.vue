@@ -180,7 +180,7 @@
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="title" class="form-label">Title</label>
-                  <input type="text" class="form-control" id="title" v-model="editProfile.job_title" />
+                  <input type="text" class="form-control" id="job_title" v-model="editProfile.job_title" />
                 </div>
               </div>
               <div class="row">
@@ -205,7 +205,7 @@
               <div class="mb-3">
                 <label class="form-label">Skills</label>
                 <input type="text" class="form-control mb-2" id="skillSearch" placeholder="Type a skill and press Enter"
-                  v-model="newSkill" @keyup.enter="addSkill" />
+                  v-model="newSkill" @keydown.enter.prevent="addSkill" />
                 <div id="allSkillsContainer">
                   <span v-for="skill in suggestedSkills" :key="skill" class="modal-skill-tag"
                     :class="{ selected: editProfile.skills.includes(skill) }" @click="toggleSkill(skill)">{{
@@ -239,6 +239,7 @@
 import { ref, onMounted } from 'vue';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
+const PROFILE_CACHE_KEY = 'userProfileCache';
 
 //profile state
 const profile = ref({
@@ -320,6 +321,8 @@ async function saveProfileChanges() {
     });
     if (!response.ok) throw new Error('Failed to update profile');
     profile.value = { ...editProfile.value, email };
+    // Update cache after save
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile.value));
     showNotification('Profile updated successfully!');
     // Hide modal by triggering the close button click (Bootstrap will handle cleanup)
     const modalElement = document.getElementById('editProfileModal');
@@ -359,6 +362,14 @@ function showNotification(message, type = 'success') {
 }
 
 onMounted(async () => {
+  // Try to load profile from localStorage for instant UI
+  const cached = localStorage.getItem(PROFILE_CACHE_KEY);
+  if (cached) {
+    try {
+      profile.value = JSON.parse(cached);
+      console.log('Loaded profile from cache:', profile.value);
+    } catch {}
+  }
 
   // Get user info from sessionStorage
   const oidcUserRaw = sessionStorage.getItem(oidcStorageKey);
@@ -367,7 +378,7 @@ onMounted(async () => {
   const token = oidcUser && oidcUser.id_token;
   const userId = oidcUser.profile.sub || oidcUser.profile.username;
 
-  // Fetch profile from backend
+  // Fetch profile from backend (background refresh)
   try {
     const response = await fetch(`${apiBaseUrl}/users/${userId}/skills`, {
       headers: {
@@ -376,15 +387,17 @@ onMounted(async () => {
     });
     if (!response.ok) throw new Error('Failed to fetch profile');
     const data = await response.json();
-    // If your backend returns the whole item, use:
     profile.value = {
       name: data.name || '',
-      title: data.title || '',
+      job_title: data.job_title || '',
       email: data.email || oidcUser.profile.email || '',
       location: data.location || '',
       bio: data.bio || '',
       skills: data.skills || [],
+      phone: data.phone || '',
     };
+    // Update cache
+    localStorage.setItem(PROFILE_CACHE_KEY, JSON.stringify(profile.value));
   } catch (err) {
     console.error('Error fetching profile:', err);
   }

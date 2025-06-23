@@ -6,6 +6,7 @@ import ProjectDetails from '../components/ProjectDetails.vue'; // Note: Renamed 
 import UserDashboard from '@/components/UserDashboard.vue';
 import ProjectOwner from '@/components/ProjectOwner.vue';
 import Home from '@/components/Home.vue';
+import AllProjects from '@/components/AllProjects.vue';
 import { userManager } from '@/auth/oidc';
 
 
@@ -53,6 +54,12 @@ const routes = [
     component: ProjectOwner,
     meta: { requiresAuth: true }
   },
+  {
+    path: '/allProjects',
+    name: 'AllProjects',
+    component: AllProjects,
+  }
+
   
 ];
 

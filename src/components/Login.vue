@@ -5,7 +5,7 @@
         <a class="navbar-brand" href="#">ProjectHub</a>
       </div>
     </nav>
-    <div class="container hero">
+    <div class="container hero mt-5">
       <div class="illustration-box">
         <img :src="cloudfrontUrl + 'images/projecthub-logo.png'" alt="Project Hub Logo" class="img-fluid">
       </div>
@@ -40,10 +40,10 @@
         </div>
       </div>
     </div>
-    <footer class="footer">
-      <p>&copy; 2025 ProjectHub. All rights reserved.</p>
-    </footer>
   </div>
+  <!-- <footer class="footer">
+    <p>&copy; 2025 ProjectHub. All rights reserved.</p>
+  </footer> -->
 </template>
 
 <script setup>
@@ -119,14 +119,14 @@ vertical-hero-container {
   /* height: 100%; */
   /* Constrain width for better appearance */
   /* margin: 30px auto; */
-  margin-top: 6px;
+  margin-top: 20px;
+
   /* Reduced top/bottom margin */
-  flex-grow: 1;
+  flex-grow: 1 0 auto;
+  align-items: center;
   /* Allows content to push footer down */
   justify-content: center;
-  /* Vertically center content if there's extra space */
 
-  /* Removed initial state for loading animation properties */
 }
 
 /* Removed .hero.hero-loaded class */
@@ -240,6 +240,7 @@ vertical-hero-container {
 /* Footer (from Profile5.html) */
 .footer {
   text-align: center;
+  flex-shrink: 0;
   padding: 20px;
   /* Reduced padding */
   color: #777;

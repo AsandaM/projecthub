@@ -23,7 +23,7 @@
     background-color: #f8f9fa;
     /* Light background for footer */
     border-top: 1px solid #e9ecef;
-    margin-top: 40px;
+    margin-top: 10px;
 }
 
 .footer a {

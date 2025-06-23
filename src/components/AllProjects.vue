@@ -29,42 +29,17 @@
                 </div>
             </div>
 
-            <h4 class="mt-5 fw-bold">Recommended Projects</h4>
-            <div class="row mt-3">
+            <!-- <h4 class="mt-5 fw-bold">Recommended Projects</h4> -->
+            <!-- No projects found message -->
+            <div v-if="!recommendedProjects.length && !loading" class="text-center text-muted my-5" id="no-projects">
+                <i class="fas fa-search fa-2x mb-3"></i>
+                <div>No projects found matching your criteria.</div>
+            </div>
+            <div class="row mt-5">
                 <div v-for="(project, index) in recommendedProjects" :key="project.projectId" class="col-md-4 mb-4">
                     <div class="project-card">
                         <div class="project-icon">
                             <i :class="projectIcons[index % projectIcons.length]"></i>
-                        </div>
-                        <div class="project-body">
-                            <h6 class="fw-bold">{{ project.title }}</h6>
-                            <p>{{ project.description }}</p>
-                            <router-link :to="`/project/object/${project.projectId}`"
-                                class="btn btn-sm btn-light border"> View More</router-link>
-                            <button class="btn btn-sm btn-orange float-end"
-                                :class="joinedProjects.includes(project.projectId) ? 'btn-secondary' : 'btn-orange'"
-                                @click.prevent="handleJoin(project.projectId)">
-                                {{ joinedProjects.includes(project.projectId) ? 'Joined' : 'Join' }}
-                            </button>
-                            <button class="btn btn-light border ms-2" @click.prevent="toggleBookmark(project.projectId)"
-                                :title="bookmarkedProjects.includes(project.projectId) ? 'Remove Bookmark' : 'Bookmark for later'">
-                                <i
-                                    :class="bookmarkedProjects.includes(project.projectId) ? 'fas fa-bookmark text-warning' : 'far fa-bookmark'"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center">
-                <h4 class="mt-5 fw-bold">Explore More Projects</h4>
-                <router-link to="/allProjects" class="text-orange fw-semibold fs-5">View All &gt;</router-link>
-            </div>
-            <div class="row mt-3">
-                <div v-for="(project, index) in exploreMoreProjects" :key="project.projectId" class="col-md-4 mb-4">
-                    <div class="project-card">
-                        <div class="project-icon">
-                            <i :class="projectIcon[index % projectIcon.length]"></i>
                         </div>
                         <div class="project-body">
                             <h6 class="fw-bold">{{ project.title }}</h6>
@@ -252,12 +227,9 @@ function closeSkillsModal() {
 }
 
 const recommendedProjects = computed(() => {
-    return filteredProjects.value.slice(0, 3);
+    return filteredProjects.value;
 });
 
-const exploreMoreProjects = computed(() => {
-    return filteredProjects.value.slice(3, 9);
-});
 
 function handleJoin(projectId) {
     if (joinedProjects.value.includes(projectId)) {
@@ -402,4 +374,5 @@ function toggleBookmark(projectId) {
         font-size: 1.2rem;
     }
 }
+
 </style>

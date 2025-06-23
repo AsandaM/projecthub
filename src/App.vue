@@ -1,11 +1,14 @@
 <template>
-  <main>
+  <main class="app-main">
     <Spinner v-if="loading" />
     <NavBar v-if="!hideNavAndFooter" />
-    <router-view />
-    <FooterComp v-if="!hideNavAndFooter" />
+    <div class="app-content">
+      <router-view />
+    </div>
+    <FooterComp />
   </main>
 </template>
+
 <script>
 import { computed, ref, provide } from 'vue';
 import { useRoute } from 'vue-router'
@@ -33,22 +36,25 @@ export default {
 </script>
 
 <style>
-html {
-  font-size: 16px;
-  /* Reset base font size */
+html, body, #app {
+  height: 100%;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  /* font-family: Arial, sans-serif; */
+.app-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-  /* Softer, deeper gradient */
+  background: #d9e2ec;
   font-family: 'Amazon Ember', 'Segoe UI', -apple-system, BlinkMacMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   color: #232f3e;
   padding-top: 70px;

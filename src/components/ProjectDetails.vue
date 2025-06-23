@@ -20,7 +20,7 @@
         <div class="col-md-8 d-flex">
           <div class="project-card mb-4 w-100">
             <h5 class="fw-bold">Project Details</h5>
-            <p>{{ project.description }}</p>
+            <p>{{ project.detail }}</p>
 
             <h6 class="fw-semibold mt-4">Required Skills</h6>
             <span v-for="skill in project.required_skills" :key="skill" class="badge badge-skill">{{ skill }}</span>
@@ -31,7 +31,7 @@
                 <p><strong>Team Size:</strong> {{ project.team_size }}</p>
               </div>
               <div class="col-sm-6">
-                <p><strong>Location:</strong> Remote</p>
+                <p><strong>Location:</strong> {{project.location}}</p>
                 <p><strong>Start Date:</strong> {{ project.start_date }}</p>
               </div>
             </div>
