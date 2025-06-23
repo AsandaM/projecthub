@@ -197,11 +197,13 @@
     </div>
   </div>
 </template>
+
 <script setup>
-import { ref } from 'vue'; 
+import { ref } from 'vue';
+import { Auth } from 'aws-amplify'; 
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
-const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
+const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject';
 
 const projectTitle = ref('');
 const projectDescription = ref('');
@@ -213,25 +215,29 @@ const imageUrl = ref('');
 
 const createProject = async () => {
   console.log('createProject function called');
-  
-  const payload = {
-    title: document.getElementById('projectTitle').value,
-    description: document.getElementById('projectDescription').value,
-    deadline: document.getElementById('projectDeadline').value,
-    budget: document.getElementById('projectBudget').value,
-    skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
-    teamCapacity: document.getElementById('teamCapacity').value,
-    imageUrl: '', 
-  };
-
-  console.log('Sending payload:', payload);
 
   try {
+    const session = await Auth.currentSession();
+    const token = session.getIdToken().getJwtToken();
+    
+    const payload = {
+      title: projectTitle.value,       
+      description: projectDescription.value,
+      deadline: projectDeadline.value,
+      budget: projectBudget.value,
+      skills: projectSkills.value,
+      teamCapacity: teamCapacity.value,
+      imageUrl: imageUrl.value,
+    };
+
+    console.log('Sending payload:', payload);
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': token 
       },
       body: JSON.stringify(payload)
     });
@@ -255,9 +261,21 @@ const createProject = async () => {
     console.log('Success:', data);
     alert('Project created successfully!');
     
+    projectTitle.value = '';
+    projectDescription.value = '';
+    projectDeadline.value = '';
+    projectBudget.value = 0;
+    projectSkills.value = [];
+    teamCapacity.value = 1;
+    imageUrl.value = '';
+
   } catch (error) {
     console.error('Detailed error:', error);
-    alert('Failed to create project: ' + error.message);
+    if (error.message.includes('No current user')) {
+      alert('Please sign in to create a project');
+    } else {
+      alert('Failed to create project: ' + error.message);
+    }
   }
 };
 
