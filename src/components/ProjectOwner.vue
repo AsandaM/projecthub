@@ -260,19 +260,22 @@ const handleRequest = async (action, userName, courseTitle, button) => {
   }
 };
 
+// Original createProject implementation
 const createProject = async () => {
+  console.log('createProject function called');
+  
+  const payload = {
+    title: document.getElementById('projectTitle').value,
+    description: document.getElementById('projectDescription').value,
+    deadline: document.getElementById('projectDeadline').value,
+    skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
+    teamCapacity: document.getElementById('teamCapacity').value,
+    imageUrl: '', 
+  };
+
+  console.log('Sending payload:', payload);
+
   try {
-    const payload = {
-      title: projectTitle.value,
-      description: projectDescription.value,
-      deadline: projectDeadline.value,
-      skills: projectSkills.value,
-      teamCapacity: teamCapacity.value,
-      imageUrl: imageUrl.value,
-    };
-
-    console.log('Creating project:', payload);
-
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -282,25 +285,28 @@ const createProject = async () => {
       body: JSON.stringify(payload)
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers));
+
+    const responseText = await response.text();
+    console.log('Raw response:', responseText);
+
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Server returned ${response.status}: ${errorText}`);
+      try {
+        const errorData = JSON.parse(responseText);
+        throw new Error(errorData.message || 'Failed to create project');
+      } catch (e) {
+        throw new Error(`Server returned ${response.status}: ${responseText}`);
+      }
     }
 
-    const data = await response.json();
-    console.log('Project created:', data);
-    showNotification('Project created successfully!');
-    
-    // Reset form
-    projectTitle.value = '';
-    projectDescription.value = '';
-    projectDeadline.value = '';
-    projectSkills.value = [];
-    teamCapacity.value = 1;
+    const data = JSON.parse(responseText);
+    console.log('Success:', data);
+    alert('Project created successfully!');
     
   } catch (error) {
-    console.error('Error creating project:', error);
-    showNotification(`Failed to create project: ${error.message}`, 'danger');
+    console.error('Detailed error:', error);
+    alert('Failed to create project: ' + error.message);
   }
 };
 
