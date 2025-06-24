@@ -195,6 +195,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import * as bootstrap from 'bootstrap';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_ENDPOINTS = {
@@ -213,11 +214,11 @@ const updateTableContent = (newProject) => {
   const tbody = document.querySelector('.table-container tbody');
   if (tbody) {
     const newRow = document.createElement('tr');
-    newRow.className = tbody.children.length % 2 === 0 ? 'first-tab' : 'second-tab';
-    
+    // Match the exact structure of the original table rows
+    const rowClass = tbody.children.length % 2 === 0 ? 'first-tab' : 'second-tab';
     newRow.innerHTML = `
-      <td data-label="Project Title">${newProject.title}</td>
-      <td data-label="Status">
+      <td class="${rowClass}" data-label="Project Title">${newProject.title}</td>
+      <td class="${rowClass}" data-label="Status">
         <select class="form-select">
           <option ${newProject.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
           <option ${newProject.status === 'Completed' ? 'selected' : ''}>Completed</option>
@@ -240,8 +241,6 @@ const createProject = async () => {
     imageUrl: '', 
   };
 
-  console.log('Sending payload:', payload);
-
   try {
     const response = await fetch(API_ENDPOINTS.create, {
       method: 'POST',
@@ -252,13 +251,8 @@ const createProject = async () => {
       body: JSON.stringify(payload)
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers));
-
-    const responseText = await response.text();
-    console.log('Raw response:', responseText);
-
     if (!response.ok) {
+      const responseText = await response.text();
       try {
         const errorData = JSON.parse(responseText);
         throw new Error(errorData.message || 'Failed to create project');
@@ -267,9 +261,8 @@ const createProject = async () => {
       }
     }
 
-    const data = JSON.parse(responseText);
-    console.log('Success:', data);
-
+    const data = await response.json();
+    
     // Add new project to the table
     updateTableContent({
       title: payload.title,
@@ -285,23 +278,16 @@ const createProject = async () => {
       document.getElementById('teamCapacity').value = '1';
     }
 
-    alert('Project created successfully!');
-
-    // Properly close the modal and remove backdrop
+    // Properly close the modal using Bootstrap
     const modalElement = document.getElementById('createProjectModal');
     if (modalElement) {
-      modalElement.classList.remove('show');
-      modalElement.style.display = 'none';
-      document.body.classList.remove('modal-open');
-      
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) {
-        backdrop.remove();
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
       }
-      
-      document.body.style.overflow = '';
-      document.body.style.paddingRight = '';
     }
+
+    alert('Project created successfully!');
     
   } catch (error) {
     console.error('Detailed error:', error);
@@ -312,14 +298,11 @@ const createProject = async () => {
 const updateProjects = async () => {
   try {
     const response = await fetch(API_ENDPOINTS.update);
-    console.log('Update response status:', response.status);
-
     if (!response.ok) {
       throw new Error(`Failed to fetch projects: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Fetched projects:', data);
     
     const tbody = document.querySelector('.table-container tbody');
     if (tbody && Array.isArray(data)) {
@@ -328,20 +311,9 @@ const updateProjects = async () => {
           .map(td => td.textContent)
       );
 
-      data.forEach((project, index) => {
+      data.forEach(project => {
         if (!existingProjects.has(project.title)) {
-          const newRow = document.createElement('tr');
-          newRow.className = (tbody.children.length + index) % 2 === 0 ? 'first-tab' : 'second-tab';
-          newRow.innerHTML = `
-            <td data-label="Project Title">${project.title}</td>
-            <td data-label="Status">
-              <select class="form-select">
-                <option ${project.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
-                <option ${project.status === 'Completed' ? 'selected' : ''}>Completed</option>
-              </select>
-            </td>
-          `;
-          tbody.appendChild(newRow);
+          updateTableContent(project);
         }
       });
     }
