@@ -176,8 +176,8 @@
       <div class="right-column mt-5">
         <div class="profile-card">
           <img :src="cloudfrontUrl + 'images/me.jpeg'" alt="User Avatar">
-          <h3>Ethan Hector</h3>
-          <p class="text-muted">Cloud Support Engineer I | AWS Cloud Enthusiast</p>
+          <h3>Asanda Mehlo</h3>
+          <p class="text-muted">Cloud Support Associate Intern</p>
           <router-link to="/profile" class="btn btn-outline-primary btn-sm btn-profile">View Full Profile</router-link>
 
           <div class="activity-section">

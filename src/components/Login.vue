@@ -12,19 +12,18 @@
 
       <!-- <h1 class="mb-2">Welcome to ProjectHub</h1> -->
       <p class="mb-3 px-lg-4">Explore a growing list of exciting internal projects <br> designed to match your skills
-        and
-        interests.</p>
+        and interests.</p>
 
-      <p>Log in and find the project that's waiting for you.</p>
+      <p>Sign in and find the project that's waiting for you.</p>
 
       <div class="d-flex justify-content-center gap-3 mb-3 flex-wrap">
-        <button @click="signIn" class="btn btn-orange">Login →</button>
+        <button @click="signIn" class="btn btn-orange">Sign In →</button>
       </div>
 
       <!--  project owner-->
       <p class="small mt-2">
         <a href="#" @click.prevent="ownerSignIn" class="owner-link">
-          For approved project leads: Upload your project →
+          Have a project in mind? Upload your project →
         </a>
       </p>
 
