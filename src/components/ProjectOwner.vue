@@ -198,7 +198,7 @@ import { ref, onMounted } from 'vue';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
-const SNS_API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/notifications'; 
+const SNS_API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/requestNotifications'; 
 
 
 const projectTitle = ref('');
