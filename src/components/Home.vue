@@ -135,7 +135,7 @@ const locationOptions = [
     '', 'Cape Town, South Africa', 'Dublin, Ireland', 'Nairobi, Kenya'
 ];
 const domainOptions = [
-    '', 'Deployment', 'Linux', 'Windows', 'Databases', 'SCD', 'Networking', 'Big Data & AIML', 'Analytics', 'Security', 'DMS'
+    '', 'Deployment', 'Linux', 'Windows', 'Databases', 'SCD', 'Networking', 'Big Data & AI/ML', 'Analytics', 'Security', 'DMS'
 ];
 const durationOptions = [
     '', '>1 Month', '1 Month', '2 Month', '3+ Month'
