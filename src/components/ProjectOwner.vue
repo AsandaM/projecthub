@@ -115,17 +115,24 @@
                 <option value="Digital Marketing">Digital Marketing</option>
               </select>
             </div>
-   
-            <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/js/multi-select-tag.min.js"></script>
             <script>
-              var tagSelector = new MultiSelectTag('projectSkills', {
-                maxSelection: 5,              
-                required: true,              
-                placeholder: 'Search tags',   
-                onChange: function(selected) { 
-                  console.log('Selection changed:', selected);
-                }
-              });
+            import { onMounted } from 'vue';
+            import 'https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/js/multi-select-tag.min.js';
+              
+            export default {
+              setup() {
+                onMounted(() => {
+                  new MultiSelectTag('projectSkills', {
+                    maxSelection: 5,
+                    required: true,
+                    placeholder: 'Search tags',
+                    onChange: function(selected) {
+                      console.log('Selection changed:', selected);
+                    }
+                  });
+                });
+              }
+            }
             </script>
 
 
@@ -280,7 +287,7 @@ defineExpose({ createProject });
 
 <style scoped>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/css/multi-select-tag.min.css">
+@import "https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/css/multi-select-tag.min.css";
   
 /* Main Content Container */
 .container-main {
