@@ -30,17 +30,24 @@
             </tr>
           </thead>
           <tbody>
-          <tr v-for="(project, index) in projects" 
-              :key="index"
-              :class="[index % 2 === 0 ? 'first-tab' : 'second-tab']">
-            <td data-label="Project Title">{{ project.title }}</td>
-            <td data-label="Status">
-              <select class="form-select">
-                <option selected>{{ project.status }}</option>
-                <option>{{ project.status === 'Ongoing' ? 'Completed' : 'Ongoing' }}</option>
-              </select>
-            </td>
-          </tr>
+          <tr class="first-tab">
+              <td data-label="Project Title">Web App Development</td>
+              <td data-label="Status">
+                <select class="form-select">
+                  <option>Ongoing</option>
+                  <option>Completed</option>
+                </select>
+              </td>
+            </tr>
+            <tr class="second-tab">
+              <td data-label="Project Title">Mobile App Design</td>
+              <td data-label="Status">
+                <select class="form-select">
+                  <option>Ongoing</option>
+                  <option>Completed</option>
+                </select>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -187,43 +194,34 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue'; 
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
-const API_ENDPOINTS = {
-  create: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject',
-  update: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/updateProject'
-};
+const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
 
-// Initialize projects as a reactive array
-const projects = ref([
-  { title: 'Web App Development', status: 'Ongoing' },
-  { title: 'Mobile App Design', status: 'Completed' }
-]);
+const projectTitle = ref('');
+const projectDescription = ref('');
+const projectDeadline = ref('');
+const projectSkills = ref([]);
+const teamCapacity = ref(1);
+const imageUrl = ref('');
 
 const createProject = async () => {
+  console.log('createProject function called');
+  
+  const payload = {
+    title: document.getElementById('projectTitle').value,
+    description: document.getElementById('projectDescription').value,
+    deadline: document.getElementById('projectDeadline').value,
+    skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
+    teamCapacity: document.getElementById('teamCapacity').value,
+    imageUrl: '', 
+  };
+
+  console.log('Sending payload:', payload);
+
   try {
-    // Get form values directly from DOM elements
-    const title = document.getElementById('projectTitle').value;
-    const description = document.getElementById('projectDescription').value;
-    
-    // Validate required fields
-    if (!title || !description) {
-      throw new Error('Title and description are required');
-    }
-
-    const payload = {
-      title: title,
-      description: description,
-      deadline: document.getElementById('projectDeadline').value,
-      skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
-      teamCapacity: document.getElementById('teamCapacity').value,
-      imageUrl: ''
-    };
-
-    console.log('Sending payload:', payload); // Debug log
-
-    const response = await fetch(API_ENDPOINTS.create, {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -232,70 +230,33 @@ const createProject = async () => {
       body: JSON.stringify(payload)
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers));
+
     const responseText = await response.text();
-    console.log('Response:', responseText); // Debug log
+    console.log('Raw response:', responseText);
 
     if (!response.ok) {
       try {
         const errorData = JSON.parse(responseText);
-        throw new Error(errorData.error || 'Failed to create project');
+        throw new Error(errorData.message || 'Failed to create project');
       } catch (e) {
-        throw new Error(`Server error: ${responseText}`);
+        throw new Error(`Server returned ${response.status}: ${responseText}`);
       }
     }
 
-    // Add new project to the reactive array
-    projects.value.push({
-      title: payload.title,
-      status: 'Ongoing'
-    });
-
-    // Clear form
-    document.getElementById('projectTitle').value = '';
-    document.getElementById('projectDescription').value = '';
-    document.getElementById('projectDeadline').value = '';
-    document.getElementById('projectSkills').selectedIndex = -1;
-    document.getElementById('teamCapacity').value = '1';
-
-    // Close modal using Bootstrap
-    const modalEl = document.getElementById('createProjectModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) {
-      modal.hide();
-    }
-
+    const data = JSON.parse(responseText);
+    console.log('Success:', data);
     alert('Project created successfully!');
+    
   } catch (error) {
     console.error('Detailed error:', error);
-    alert(error.message);
+    alert('Failed to create project: ' + error.message);
   }
 };
-
-const updateProjects = async () => {
-  try {
-    const response = await fetch(API_ENDPOINTS.update);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch projects: ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (Array.isArray(data)) {
-      const existingTitles = new Set(projects.value.map(p => p.title));
-      const newProjects = data.filter(p => !existingTitles.has(p.title));
-      if (newProjects.length > 0) {
-        projects.value = [...projects.value, ...newProjects];
-      }
-    }
-  } catch (error) {
-    console.error('Error updating projects:', error);
-  }
-};
-
-onMounted(() => {
-  updateProjects();
-});
 
 defineExpose({ createProject });
+</script>
 </script>
 
 <style scoped>
