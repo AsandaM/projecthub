@@ -115,6 +115,16 @@
                 <option value="Digital Marketing">Digital Marketing</option>
               </select>
             </div>
+            
+            <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/js/multi-select-tag.min.js"></script>
+            <script>
+            var tagSelector = new MultiSelectTag('projectSkills', {        
+                placeholder: 'Search tags',
+                onChange: function(selected) { 
+                    console.log('Selection changed:', selected);
+                }
+                });
+            </script>
 
             <div class="mb-3">
               <label for="teamCapacity" class="form-label">Team Capacity</label>
