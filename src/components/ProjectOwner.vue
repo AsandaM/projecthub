@@ -257,7 +257,6 @@ const createProject = async () => {
 
 defineExpose({ createProject });
 </script>
-</script>
 
 <style scoped>
 
