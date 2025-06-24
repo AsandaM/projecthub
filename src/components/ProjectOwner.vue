@@ -261,10 +261,16 @@ const createProject = async () => {
     teamCapacity.value = 1;
     imageUrl.value = '';
 
-    // Close the modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('createProjectModal'));
-    if (modal) {
-      modal.hide();
+    // Close modal using native DOM method
+    const modalElement = document.getElementById('createProjectModal');
+    if (modalElement) {
+      modalElement.style.display = 'none';
+      modalElement.classList.remove('show');
+      document.body.classList.remove('modal-open');
+      const modalBackdrop = document.querySelector('.modal-backdrop');
+      if (modalBackdrop) {
+        modalBackdrop.remove();
+      }
     }
 
     // Fetch updated projects
