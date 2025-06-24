@@ -189,19 +189,18 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-  defineOptions({
-  compilerOptions: {
-    isCustomElement: tag => tag.includes('-')
-  }
-});
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_ENDPOINTS = {
   create: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject',
   update: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/updateProject'
 };
 
-// Reactive references
-const projects = ref([]);
+// Initialize projects as a reactive array
+const projects = ref([
+  { title: 'Web App Development', status: 'Ongoing' },
+  { title: 'Mobile App Design', status: 'Completed' }
+]);
+
 const formData = ref({
   title: '',
   description: '',
@@ -229,22 +228,20 @@ const createProject = async () => {
       })
     });
 
-    const responseText = await response.text();
-    
     if (!response.ok) {
-      throw new Error(`Failed to create project: ${responseText}`);
+      const text = await response.text();
+      throw new Error(text);
     }
 
-    const data = JSON.parse(responseText);
-    console.log('Project created:', data);
-
-    // Add new project to the reactive projects array
+    const data = await response.json();
+    
+    // Add new project to the reactive array
     projects.value.push({
       title: formData.value.title,
       status: 'Ongoing'
     });
 
-    // Reset form data
+    // Reset form
     formData.value = {
       title: '',
       description: '',
@@ -254,22 +251,17 @@ const createProject = async () => {
       imageUrl: ''
     };
 
-    // Reset form fields
-    const modal = document.getElementById('createProjectModal');
+    // Close modal using Bootstrap
+    const modalEl = document.getElementById('createProjectModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
     if (modal) {
-      modal.style.display = 'none';
-      document.body.classList.remove('modal-open');
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) backdrop.remove();
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('padding-right');
+      modal.hide();
     }
 
     alert('Project created successfully!');
-    
   } catch (error) {
     console.error('Error:', error);
-    alert(error.message);
+    alert('Failed to create project: ' + error.message);
   }
 };
 
@@ -282,10 +274,12 @@ const updateProjects = async () => {
 
     const data = await response.json();
     if (Array.isArray(data)) {
-      // Add only new projects that don't exist in the current list
+      // Add only new projects
       const existingTitles = new Set(projects.value.map(p => p.title));
       const newProjects = data.filter(p => !existingTitles.has(p.title));
-      projects.value = [...projects.value, ...newProjects];
+      if (newProjects.length > 0) {
+        projects.value = [...projects.value, ...newProjects];
+      }
     }
   } catch (error) {
     console.error('Error updating projects:', error);
