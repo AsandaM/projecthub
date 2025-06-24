@@ -31,13 +31,13 @@
           </thead>
           <tbody>
           <tr v-for="(project, index) in projects" 
-              :key="project.title"
-              :class="index % 2 === 0 ? 'first-tab' : 'second-tab'">
-            <td :data-label="'Project Title'">{{ project.title }}</td>
-            <td :data-label="'Status'">
-              <select class="form-select" v-model="project.status">
-                <option>Ongoing</option>
-                <option>Completed</option>
+              :key="index"
+              :class="[index % 2 === 0 ? 'first-tab' : 'second-tab']">
+            <td data-label="Project Title">{{ project.title }}</td>
+            <td data-label="Status">
+              <select class="form-select">
+                <option selected>{{ project.status }}</option>
+                <option>{{ project.status === 'Ongoing' ? 'Completed' : 'Ongoing' }}</option>
               </select>
             </td>
           </tr>
@@ -201,55 +201,61 @@ const projects = ref([
   { title: 'Mobile App Design', status: 'Completed' }
 ]);
 
-const formData = ref({
-  title: '',
-  description: '',
-  deadline: '',
-  skills: [],
-  teamCapacity: '1',
-  imageUrl: ''
-});
-
 const createProject = async () => {
   try {
+    // Get form values directly from DOM elements
+    const title = document.getElementById('projectTitle').value;
+    const description = document.getElementById('projectDescription').value;
+    
+    // Validate required fields
+    if (!title || !description) {
+      throw new Error('Title and description are required');
+    }
+
+    const payload = {
+      title: title,
+      description: description,
+      deadline: document.getElementById('projectDeadline').value,
+      skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
+      teamCapacity: document.getElementById('teamCapacity').value,
+      imageUrl: ''
+    };
+
+    console.log('Sending payload:', payload); // Debug log
+
     const response = await fetch(API_ENDPOINTS.create, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        title: formData.value.title,
-        description: formData.value.description,
-        deadline: formData.value.deadline,
-        skills: formData.value.skills,
-        teamCapacity: formData.value.teamCapacity,
-        imageUrl: formData.value.imageUrl
-      })
+      body: JSON.stringify(payload)
     });
 
+    const responseText = await response.text();
+    console.log('Response:', responseText); // Debug log
+
     if (!response.ok) {
-      const text = await response.text();
-      throw new Error(text);
+      try {
+        const errorData = JSON.parse(responseText);
+        throw new Error(errorData.error || 'Failed to create project');
+      } catch (e) {
+        throw new Error(`Server error: ${responseText}`);
+      }
     }
 
-    const data = await response.json();
-    
     // Add new project to the reactive array
     projects.value.push({
-      title: formData.value.title,
+      title: payload.title,
       status: 'Ongoing'
     });
 
-    // Reset form
-    formData.value = {
-      title: '',
-      description: '',
-      deadline: '',
-      skills: [],
-      teamCapacity: '1',
-      imageUrl: ''
-    };
+    // Clear form
+    document.getElementById('projectTitle').value = '';
+    document.getElementById('projectDescription').value = '';
+    document.getElementById('projectDeadline').value = '';
+    document.getElementById('projectSkills').selectedIndex = -1;
+    document.getElementById('teamCapacity').value = '1';
 
     // Close modal using Bootstrap
     const modalEl = document.getElementById('createProjectModal');
@@ -260,8 +266,8 @@ const createProject = async () => {
 
     alert('Project created successfully!');
   } catch (error) {
-    console.error('Error:', error);
-    alert('Failed to create project: ' + error.message);
+    console.error('Detailed error:', error);
+    alert(error.message);
   }
 };
 
@@ -274,7 +280,6 @@ const updateProjects = async () => {
 
     const data = await response.json();
     if (Array.isArray(data)) {
-      // Add only new projects
       const existingTitles = new Set(projects.value.map(p => p.title));
       const newProjects = data.filter(p => !existingTitles.has(p.title));
       if (newProjects.length > 0) {
