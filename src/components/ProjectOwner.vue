@@ -194,11 +194,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'; 
+import { ref, onMounted } from 'vue';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
-const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
+const API_ENDPOINTS = {
+  create: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject',
+  update: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/updateProject'
+};
 
+const projects = ref([]);
 const projectTitle = ref('');
 const projectDescription = ref('');
 const projectDeadline = ref('');
@@ -221,7 +225,7 @@ const createProject = async () => {
   console.log('Sending payload:', payload);
 
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(API_ENDPOINTS.create, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -249,11 +253,50 @@ const createProject = async () => {
     console.log('Success:', data);
     alert('Project created successfully!');
     
+    // Clear form fields
+    projectTitle.value = '';
+    projectDescription.value = '';
+    projectDeadline.value = '';
+    projectSkills.value = [];
+    teamCapacity.value = 1;
+    imageUrl.value = '';
+
+    // Close the modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('createProjectModal'));
+    if (modal) {
+      modal.hide();
+    }
+
+    // Fetch updated projects
+    await updateProjects();
+    
   } catch (error) {
     console.error('Detailed error:', error);
     alert('Failed to create project: ' + error.message);
   }
 };
+
+const updateProjects = async () => {
+  try {
+    const response = await fetch(API_ENDPOINTS.update);
+    console.log('Update response status:', response.status);
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch projects: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched projects:', data);
+    projects.value = data;
+  } catch (error) {
+    console.error('Error updating projects:', error);
+  }
+};
+
+// Fetch projects when component mounts
+onMounted(() => {
+  updateProjects();
+});
 
 defineExpose({ createProject });
 </script>
