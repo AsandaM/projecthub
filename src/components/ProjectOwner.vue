@@ -115,15 +115,17 @@
                 <option value="Digital Marketing">Digital Marketing</option>
               </select>
             </div>
-            
             <script>
-              mounted() {
-                new MultiSelectTag('projectSkills', {
-                  placeholder: 'Search tags',
-                  onChange: function(selected) {
-                    console.log('Selection changed:', selected);
-                  }
-                });
+              import 'https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/js/multi-select-tag.min.js';
+              export default {
+                mounted() {
+                  new MultiSelectTag('projectSkills', {
+                    placeholder: 'Search tags',
+                    onChange: function(selected) {
+                      console.log('Selection changed:', selected);
+                    }
+                  });
+                }
               }
             </script>
 
