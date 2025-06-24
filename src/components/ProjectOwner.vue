@@ -213,12 +213,14 @@ const updateTableContent = (newProject) => {
   const tbody = document.querySelector('.table-container tbody');
   if (tbody) {
     const newRow = document.createElement('tr');
+    newRow.className = tbody.children.length % 2 === 0 ? 'first-tab' : 'second-tab';
+    
     newRow.innerHTML = `
       <td data-label="Project Title">${newProject.title}</td>
       <td data-label="Status">
         <select class="form-select">
-          <option selected>Ongoing</option>
-          <option>Completed</option>
+          <option ${newProject.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
+          <option ${newProject.status === 'Completed' ? 'selected' : ''}>Completed</option>
         </select>
       </td>
     `;
@@ -285,16 +287,20 @@ const createProject = async () => {
 
     alert('Project created successfully!');
 
-    // Close modal if it exists
+    // Properly close the modal and remove backdrop
     const modalElement = document.getElementById('createProjectModal');
     if (modalElement) {
-      modalElement.style.display = 'none';
       modalElement.classList.remove('show');
+      modalElement.style.display = 'none';
       document.body.classList.remove('modal-open');
-      const modalBackdrop = document.querySelector('.modal-backdrop');
-      if (modalBackdrop) {
-        modalBackdrop.remove();
+      
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
       }
+      
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
     }
     
   } catch (error) {
@@ -315,12 +321,28 @@ const updateProjects = async () => {
     const data = await response.json();
     console.log('Fetched projects:', data);
     
-    // Clear existing table content
     const tbody = document.querySelector('.table-container tbody');
     if (tbody && Array.isArray(data)) {
-      tbody.innerHTML = '';
-      data.forEach(project => {
-        updateTableContent(project);
+      const existingProjects = new Set(
+        Array.from(tbody.querySelectorAll('td[data-label="Project Title"]'))
+          .map(td => td.textContent)
+      );
+
+      data.forEach((project, index) => {
+        if (!existingProjects.has(project.title)) {
+          const newRow = document.createElement('tr');
+          newRow.className = (tbody.children.length + index) % 2 === 0 ? 'first-tab' : 'second-tab';
+          newRow.innerHTML = `
+            <td data-label="Project Title">${project.title}</td>
+            <td data-label="Status">
+              <select class="form-select">
+                <option ${project.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
+                <option ${project.status === 'Completed' ? 'selected' : ''}>Completed</option>
+              </select>
+            </td>
+          `;
+          tbody.appendChild(newRow);
+        }
       });
     }
   } catch (error) {
@@ -328,7 +350,6 @@ const updateProjects = async () => {
   }
 };
 
-// Update projects when component mounts
 onMounted(() => {
   updateProjects();
 });
