@@ -76,8 +76,6 @@
               <input type="date" class="form-control" id="projectDeadline">
             </div>
 
-            </div>
-
             <div class="mb-3">
               <label for="projectSkills" class="form-label">Required Skills</label>
               <select name="skills" id="projectSkills" multiple>
