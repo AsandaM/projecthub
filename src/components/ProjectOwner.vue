@@ -195,7 +195,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import * as bootstrap from 'bootstrap';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_ENDPOINTS = {
@@ -213,20 +212,43 @@ const imageUrl = ref('');
 const updateTableContent = (newProject) => {
   const tbody = document.querySelector('.table-container tbody');
   if (tbody) {
-    const newRow = document.createElement('tr');
-    // Match the exact structure of the original table rows
-    const rowClass = tbody.children.length % 2 === 0 ? 'first-tab' : 'second-tab';
-    newRow.innerHTML = `
-      <td class="${rowClass}" data-label="Project Title">${newProject.title}</td>
-      <td class="${rowClass}" data-label="Status">
+    const tr = document.createElement('tr');
+    const isFirstTab = tbody.children.length % 2 === 0;
+    const bgClass = isFirstTab ? 'first-tab' : 'second-tab';
+    
+    tr.innerHTML = `
+      <td class="${bgClass}" data-label="Project Title">${newProject.title}</td>
+      <td class="${bgClass}" data-label="Status">
         <select class="form-select">
           <option ${newProject.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
           <option ${newProject.status === 'Completed' ? 'selected' : ''}>Completed</option>
         </select>
       </td>
     `;
-    tbody.appendChild(newRow);
+    tbody.appendChild(tr);
   }
+};
+
+const closeModal = () => {
+  // Remove modal classes
+  const modalEl = document.getElementById('createProjectModal');
+  if (modalEl) {
+    modalEl.style.display = 'none';
+    modalEl.classList.remove('show');
+    modalEl.setAttribute('aria-hidden', 'true');
+    modalEl.removeAttribute('aria-modal');
+  }
+
+  // Remove backdrop
+  const backdrop = document.querySelector('.modal-backdrop');
+  if (backdrop) {
+    backdrop.remove();
+  }
+
+  // Reset body
+  document.body.classList.remove('modal-open');
+  document.body.style.removeProperty('overflow');
+  document.body.style.removeProperty('padding-right');
 };
 
 const createProject = async () => {
@@ -251,47 +273,43 @@ const createProject = async () => {
       body: JSON.stringify(payload)
     });
 
+    const responseText = await response.text();
+    
     if (!response.ok) {
-      const responseText = await response.text();
-      try {
-        const errorData = JSON.parse(responseText);
-        throw new Error(errorData.message || 'Failed to create project');
-      } catch (e) {
-        throw new Error(`Server returned ${response.status}: ${responseText}`);
-      }
+      throw new Error(`Failed to create project: ${responseText}`);
     }
 
-    const data = await response.json();
-    
-    // Add new project to the table
+    const data = JSON.parse(responseText);
+    console.log('Project created:', data);
+
+    // Add new project to table
     updateTableContent({
       title: payload.title,
       status: 'Ongoing'
     });
 
-    // Clear form fields
-    if (document.getElementById('projectTitle')) {
-      document.getElementById('projectTitle').value = '';
-      document.getElementById('projectDescription').value = '';
-      document.getElementById('projectDeadline').value = '';
-      document.getElementById('projectSkills').selectedIndex = -1;
-      document.getElementById('teamCapacity').value = '1';
-    }
-
-    // Properly close the modal using Bootstrap
-    const modalElement = document.getElementById('createProjectModal');
-    if (modalElement) {
-      const modalInstance = bootstrap.Modal.getInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.hide();
+    // Clear form
+    const formElements = ['projectTitle', 'projectDescription', 'projectDeadline', 'projectSkills', 'teamCapacity'];
+    formElements.forEach(elementId => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        if (element.tagName === 'SELECT' && element.multiple) {
+          element.selectedIndex = -1;
+        } else {
+          element.value = element.tagName === 'SELECT' ? element.options[0].value : '';
+        }
       }
-    }
+    });
 
+    // Close modal properly
+    closeModal();
+
+    // Show success message
     alert('Project created successfully!');
     
   } catch (error) {
-    console.error('Detailed error:', error);
-    alert('Failed to create project: ' + error.message);
+    console.error('Error:', error);
+    alert(error.message);
   }
 };
 
