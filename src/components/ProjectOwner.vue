@@ -160,7 +160,7 @@
             <div class="request-wrapper">
               <div class="request">
                 <div class="request-info">
-                  <h4>Jane Doe</h4>
+                  <h4>Asanda Mehlo</h4>
                   <strong class="request-desc">Requested to join Web App Development</strong>
                 </div>
                 <div class="action-button">
