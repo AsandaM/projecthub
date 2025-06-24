@@ -202,7 +202,6 @@ const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/
 const projectTitle = ref('');
 const projectDescription = ref('');
 const projectDeadline = ref('');
-const projectBudget = ref(0);
 const projectSkills = ref([]);
 const teamCapacity = ref(1);
 const imageUrl = ref('');
@@ -214,7 +213,6 @@ const createProject = async () => {
     title: document.getElementById('projectTitle').value,
     description: document.getElementById('projectDescription').value,
     deadline: document.getElementById('projectDeadline').value,
-    budget: document.getElementById('projectBudget').value,
     skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
     teamCapacity: document.getElementById('teamCapacity').value,
     imageUrl: '', 
