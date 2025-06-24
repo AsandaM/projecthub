@@ -188,7 +188,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { Modal } from 'bootstrap';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_ENDPOINTS = {
@@ -201,16 +200,6 @@ const projects = ref([
   { title: 'Web App Development', status: 'Ongoing' },
   { title: 'Mobile App Design', status: 'Completed' }
 ]);
-
-const closeModal = () => {
-  const modalEl = document.getElementById('createProjectModal');
-  if (modalEl) {
-    const modalInstance = Modal.getInstance(modalEl);
-    if (modalInstance) {
-      modalInstance.hide();
-    }
-  }
-};
 
 const createProject = async () => {
   try {
@@ -232,7 +221,7 @@ const createProject = async () => {
       imageUrl: ''
     };
 
-    console.log('Sending payload:', payload);
+    console.log('Sending payload:', payload); // Debug log
 
     const response = await fetch(API_ENDPOINTS.create, {
       method: 'POST',
@@ -244,7 +233,7 @@ const createProject = async () => {
     });
 
     const responseText = await response.text();
-    console.log('Response:', responseText);
+    console.log('Response:', responseText); // Debug log
 
     if (!response.ok) {
       try {
@@ -268,8 +257,12 @@ const createProject = async () => {
     document.getElementById('projectSkills').selectedIndex = -1;
     document.getElementById('teamCapacity').value = '1';
 
-    // Close modal
-    closeModal();
+    // Close modal using Bootstrap
+    const modalEl = document.getElementById('createProjectModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) {
+      modal.hide();
+    }
 
     alert('Project created successfully!');
   } catch (error) {
