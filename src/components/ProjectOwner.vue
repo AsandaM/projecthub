@@ -116,14 +116,15 @@
               </select>
             </div>
             
-            <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/js/multi-select-tag.min.js"></script>
             <script>
-            var tagSelector = new MultiSelectTag('projectSkills', {        
-                placeholder: 'Search tags',
-                onChange: function(selected) { 
+              mounted() {
+                new MultiSelectTag('projectSkills', {
+                  placeholder: 'Search tags',
+                  onChange: function(selected) {
                     console.log('Selection changed:', selected);
-                }
+                  }
                 });
+              }
             </script>
 
             <div class="mb-3">
@@ -276,13 +277,15 @@ defineExpose({ createProject });
 </script>
 
 <style scoped>
+
+@import "https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@4.0.1/dist/css/multi-select-tag.css";
+
 /* Main Content Container */
 .container-main {
   max-width: 1200px;
   margin: 30px auto;
   padding: 0 15px;
 }
-
 /* --- Welcome Section (Modified) --- */
 .Welcome {
   margin-bottom: 30px;
