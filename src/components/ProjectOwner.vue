@@ -202,13 +202,29 @@ const API_ENDPOINTS = {
   update: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/updateProject'
 };
 
-const projects = ref([]);
 const projectTitle = ref('');
 const projectDescription = ref('');
 const projectDeadline = ref('');
 const projectSkills = ref([]);
 const teamCapacity = ref(1);
 const imageUrl = ref('');
+
+const updateTableContent = (newProject) => {
+  const tbody = document.querySelector('.table-container tbody');
+  if (tbody) {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td data-label="Project Title">${newProject.title}</td>
+      <td data-label="Status">
+        <select class="form-select">
+          <option selected>Ongoing</option>
+          <option>Completed</option>
+        </select>
+      </td>
+    `;
+    tbody.appendChild(newRow);
+  }
+};
 
 const createProject = async () => {
   console.log('createProject function called');
@@ -251,17 +267,25 @@ const createProject = async () => {
 
     const data = JSON.parse(responseText);
     console.log('Success:', data);
-    alert('Project created successfully!');
-    
-    // Clear form fields
-    projectTitle.value = '';
-    projectDescription.value = '';
-    projectDeadline.value = '';
-    projectSkills.value = [];
-    teamCapacity.value = 1;
-    imageUrl.value = '';
 
-    // Close modal using native DOM method
+    // Add new project to the table
+    updateTableContent({
+      title: payload.title,
+      status: 'Ongoing'
+    });
+
+    // Clear form fields
+    if (document.getElementById('projectTitle')) {
+      document.getElementById('projectTitle').value = '';
+      document.getElementById('projectDescription').value = '';
+      document.getElementById('projectDeadline').value = '';
+      document.getElementById('projectSkills').selectedIndex = -1;
+      document.getElementById('teamCapacity').value = '1';
+    }
+
+    alert('Project created successfully!');
+
+    // Close modal if it exists
     const modalElement = document.getElementById('createProjectModal');
     if (modalElement) {
       modalElement.style.display = 'none';
@@ -272,9 +296,6 @@ const createProject = async () => {
         modalBackdrop.remove();
       }
     }
-
-    // Fetch updated projects
-    await updateProjects();
     
   } catch (error) {
     console.error('Detailed error:', error);
@@ -293,13 +314,21 @@ const updateProjects = async () => {
 
     const data = await response.json();
     console.log('Fetched projects:', data);
-    projects.value = data;
+    
+    // Clear existing table content
+    const tbody = document.querySelector('.table-container tbody');
+    if (tbody && Array.isArray(data)) {
+      tbody.innerHTML = '';
+      data.forEach(project => {
+        updateTableContent(project);
+      });
+    }
   } catch (error) {
     console.error('Error updating projects:', error);
   }
 };
 
-// Fetch projects when component mounts
+// Update projects when component mounts
 onMounted(() => {
   updateProjects();
 });
