@@ -9,7 +9,7 @@
     <div class="dashboard-wrapper">
       <div class="projectManagement">
         <h4 class="fw-bold"><i class="fas fa-cogs"></i> Project Management</h4>
-        <p>Create and edit your projects with the tools below.</p>
+        <p>Create your project with the tool below.</p>
         <a class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createProjectModal">Create New Project</a>
       </div>
       <div class="JoinRequests">
