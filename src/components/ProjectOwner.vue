@@ -198,6 +198,8 @@ import { ref } from 'vue';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
+const SNS_API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/requestNotifications'; 
+
 
 const projectTitle = ref('');
 const projectDescription = ref('');
@@ -205,6 +207,56 @@ const projectDeadline = ref('');
 const projectSkills = ref([]);
 const teamCapacity = ref(1);
 const imageUrl = ref('');
+
+  
+const showNotification = (message, type = 'success') => {
+  const notification = document.createElement('div');
+  notification.className = `alert alert-${type}`;
+  notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000;';
+  notification.innerHTML = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+};
+
+const handleRequest = async (action, userName, courseTitle, button) => {
+  try {
+    button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+    button.disabled = true;
+
+    const response = await fetch(SNS_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userName, action, course: courseTitle }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+    console.log('Notification sent:', result);
+
+    showNotification(`You have ${action}ed ${userName}'s request to join ${courseTitle}`);
+    
+    // Remove the request from the list
+    const requestDiv = button.closest('.request-wrapper');
+    if (requestDiv) {
+      requestDiv.remove();
+    }
+
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification(`Error ${action}ing request`, 'danger');
+  } finally {
+    button.innerHTML = action.charAt(0).toUpperCase() + action.slice(1);
+    button.disabled = false;
+  }
+};
 
 const createProject = async () => {
   console.log('createProject function called');
@@ -255,11 +307,45 @@ const createProject = async () => {
   }
 };
 
+const mounted = () => {
+  document.querySelectorAll('.btn-accept, .btn-reject').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = button.classList.contains('btn-accept') ? 'accept' : 'reject';
+      const requestDiv = button.closest('.request');
+      const userName = requestDiv.querySelector('h4').textContent;
+      const courseTitle = requestDiv.querySelector('.request-desc').textContent.split('join ')[1];
+      handleRequest(action, userName, courseTitle, button);
+    });
+  });
+};
+
+onMounted(mounted);
+
+
 defineExpose({ createProject });
+
+  
 </script>
 
 <style scoped>
+.alert {
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
 
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
   
 /* Main Content Container */
 .container-main {
