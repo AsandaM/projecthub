@@ -194,12 +194,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'; 
+import { ref, onMounted } from 'vue';
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
-const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
-const SNS_API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/requestNotifications'; 
-
+const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject';
+const SNS_API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/requestNotifications';
 
 const projectTitle = ref('');
 const projectDescription = ref('');
@@ -208,7 +207,6 @@ const projectSkills = ref([]);
 const teamCapacity = ref(1);
 const imageUrl = ref('');
 
-  
 const showNotification = (message, type = 'success') => {
   const notification = document.createElement('div');
   notification.className = `alert alert-${type}`;
@@ -223,6 +221,7 @@ const showNotification = (message, type = 'success') => {
 
 const handleRequest = async (action, userName, courseTitle, button) => {
   try {
+    console.log('Processing request:', { action, userName, courseTitle });
     button.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
     button.disabled = true;
 
@@ -231,7 +230,11 @@ const handleRequest = async (action, userName, courseTitle, button) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userName, action, course: courseTitle }),
+      body: JSON.stringify({
+        userName,
+        action,
+        course: courseTitle
+      }),
     });
 
     if (!response.ok) {
@@ -243,7 +246,6 @@ const handleRequest = async (action, userName, courseTitle, button) => {
 
     showNotification(`You have ${action}ed ${userName}'s request to join ${courseTitle}`);
     
-    // Remove the request from the list
     const requestDiv = button.closest('.request-wrapper');
     if (requestDiv) {
       requestDiv.remove();
@@ -259,20 +261,18 @@ const handleRequest = async (action, userName, courseTitle, button) => {
 };
 
 const createProject = async () => {
-  console.log('createProject function called');
-  
-  const payload = {
-    title: document.getElementById('projectTitle').value,
-    description: document.getElementById('projectDescription').value,
-    deadline: document.getElementById('projectDeadline').value,
-    skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
-    teamCapacity: document.getElementById('teamCapacity').value,
-    imageUrl: '', 
-  };
-
-  console.log('Sending payload:', payload);
-
   try {
+    const payload = {
+      title: projectTitle.value,
+      description: projectDescription.value,
+      deadline: projectDeadline.value,
+      skills: projectSkills.value,
+      teamCapacity: teamCapacity.value,
+      imageUrl: imageUrl.value,
+    };
+
+    console.log('Creating project:', payload);
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -282,28 +282,25 @@ const createProject = async () => {
       body: JSON.stringify(payload)
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response headers:', Object.fromEntries(response.headers));
-
-    const responseText = await response.text();
-    console.log('Raw response:', responseText);
-
     if (!response.ok) {
-      try {
-        const errorData = JSON.parse(responseText);
-        throw new Error(errorData.message || 'Failed to create project');
-      } catch (e) {
-        throw new Error(`Server returned ${response.status}: ${responseText}`);
-      }
+      const errorText = await response.text();
+      throw new Error(`Server returned ${response.status}: ${errorText}`);
     }
 
-    const data = JSON.parse(responseText);
-    console.log('Success:', data);
-    alert('Project created successfully!');
+    const data = await response.json();
+    console.log('Project created:', data);
+    showNotification('Project created successfully!');
+    
+    // Reset form
+    projectTitle.value = '';
+    projectDescription.value = '';
+    projectDeadline.value = '';
+    projectSkills.value = [];
+    teamCapacity.value = 1;
     
   } catch (error) {
-    console.error('Detailed error:', error);
-    alert('Failed to create project: ' + error.message);
+    console.error('Error creating project:', error);
+    showNotification(`Failed to create project: ${error.message}`, 'danger');
   }
 };
 
@@ -314,7 +311,10 @@ const mounted = () => {
       const action = button.classList.contains('btn-accept') ? 'accept' : 'reject';
       const requestDiv = button.closest('.request');
       const userName = requestDiv.querySelector('h4').textContent;
-      const courseTitle = requestDiv.querySelector('.request-desc').textContent.split('join ')[1];
+      const requestDesc = requestDiv.querySelector('.request-desc').textContent;
+      const courseTitle = requestDesc.replace('Requested to join ', '');
+      
+      console.log('Request action:', { action, userName, courseTitle });
       handleRequest(action, userName, courseTitle, button);
     });
   });
@@ -322,10 +322,7 @@ const mounted = () => {
 
 onMounted(mounted);
 
-
 defineExpose({ createProject });
-
-  
 </script>
 
 <style scoped>
