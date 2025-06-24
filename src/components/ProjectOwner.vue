@@ -30,24 +30,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="first-tab">
-              <td data-label="Project Title">Web App Development</td>
-              <td data-label="Status">
-                <select class="form-select">
-                  <option>Ongoing</option>
-                  <option>Completed</option>
-                </select>
-              </td>
-            </tr>
-            <tr class="second-tab">
-              <td data-label="Project Title">Mobile App Design</td>
-              <td data-label="Status">
-                <select class="form-select">
-                  <option>Ongoing</option>
-                  <option>Completed</option>
-                </select>
-              </td>
-            </tr>
+          <tr v-for="(project, index) in projects" 
+              :key="project.title"
+              :class="index % 2 === 0 ? 'first-tab' : 'second-tab'">
+            <td :data-label="'Project Title'">{{ project.title }}</td>
+            <td :data-label="'Status'">
+              <select class="form-select" v-model="project.status">
+                <option>Ongoing</option>
+                <option>Completed</option>
+              </select>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -196,73 +189,29 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
+  defineOptions({
+  compilerOptions: {
+    isCustomElement: tag => tag.includes('-')
+  }
+});
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_ENDPOINTS = {
   create: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject',
   update: 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/updateProject'
 };
 
-const projectTitle = ref('');
-const projectDescription = ref('');
-const projectDeadline = ref('');
-const projectSkills = ref([]);
-const teamCapacity = ref(1);
-const imageUrl = ref('');
-
-const updateTableContent = (newProject) => {
-  const tbody = document.querySelector('.table-container tbody');
-  if (tbody) {
-    const tr = document.createElement('tr');
-    const isFirstTab = tbody.children.length % 2 === 0;
-    const bgClass = isFirstTab ? 'first-tab' : 'second-tab';
-    
-    tr.innerHTML = `
-      <td class="${bgClass}" data-label="Project Title">${newProject.title}</td>
-      <td class="${bgClass}" data-label="Status">
-        <select class="form-select">
-          <option ${newProject.status === 'Ongoing' ? 'selected' : ''}>Ongoing</option>
-          <option ${newProject.status === 'Completed' ? 'selected' : ''}>Completed</option>
-        </select>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-};
-
-const closeModal = () => {
-  // Remove modal classes
-  const modalEl = document.getElementById('createProjectModal');
-  if (modalEl) {
-    modalEl.style.display = 'none';
-    modalEl.classList.remove('show');
-    modalEl.setAttribute('aria-hidden', 'true');
-    modalEl.removeAttribute('aria-modal');
-  }
-
-  // Remove backdrop
-  const backdrop = document.querySelector('.modal-backdrop');
-  if (backdrop) {
-    backdrop.remove();
-  }
-
-  // Reset body
-  document.body.classList.remove('modal-open');
-  document.body.style.removeProperty('overflow');
-  document.body.style.removeProperty('padding-right');
-};
+// Reactive references
+const projects = ref([]);
+const formData = ref({
+  title: '',
+  description: '',
+  deadline: '',
+  skills: [],
+  teamCapacity: '1',
+  imageUrl: ''
+});
 
 const createProject = async () => {
-  console.log('createProject function called');
-  
-  const payload = {
-    title: document.getElementById('projectTitle').value,
-    description: document.getElementById('projectDescription').value,
-    deadline: document.getElementById('projectDeadline').value,
-    skills: Array.from(document.getElementById('projectSkills').selectedOptions).map(option => option.value),
-    teamCapacity: document.getElementById('teamCapacity').value,
-    imageUrl: '', 
-  };
-
   try {
     const response = await fetch(API_ENDPOINTS.create, {
       method: 'POST',
@@ -270,7 +219,14 @@ const createProject = async () => {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({
+        title: formData.value.title,
+        description: formData.value.description,
+        deadline: formData.value.deadline,
+        skills: formData.value.skills,
+        teamCapacity: formData.value.teamCapacity,
+        imageUrl: formData.value.imageUrl
+      })
     });
 
     const responseText = await response.text();
@@ -282,29 +238,33 @@ const createProject = async () => {
     const data = JSON.parse(responseText);
     console.log('Project created:', data);
 
-    // Add new project to table
-    updateTableContent({
-      title: payload.title,
+    // Add new project to the reactive projects array
+    projects.value.push({
+      title: formData.value.title,
       status: 'Ongoing'
     });
 
-    // Clear form
-    const formElements = ['projectTitle', 'projectDescription', 'projectDeadline', 'projectSkills', 'teamCapacity'];
-    formElements.forEach(elementId => {
-      const element = document.getElementById(elementId);
-      if (element) {
-        if (element.tagName === 'SELECT' && element.multiple) {
-          element.selectedIndex = -1;
-        } else {
-          element.value = element.tagName === 'SELECT' ? element.options[0].value : '';
-        }
-      }
-    });
+    // Reset form data
+    formData.value = {
+      title: '',
+      description: '',
+      deadline: '',
+      skills: [],
+      teamCapacity: '1',
+      imageUrl: ''
+    };
 
-    // Close modal properly
-    closeModal();
+    // Reset form fields
+    const modal = document.getElementById('createProjectModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove();
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+    }
 
-    // Show success message
     alert('Project created successfully!');
     
   } catch (error) {
@@ -321,19 +281,11 @@ const updateProjects = async () => {
     }
 
     const data = await response.json();
-    
-    const tbody = document.querySelector('.table-container tbody');
-    if (tbody && Array.isArray(data)) {
-      const existingProjects = new Set(
-        Array.from(tbody.querySelectorAll('td[data-label="Project Title"]'))
-          .map(td => td.textContent)
-      );
-
-      data.forEach(project => {
-        if (!existingProjects.has(project.title)) {
-          updateTableContent(project);
-        }
-      });
+    if (Array.isArray(data)) {
+      // Add only new projects that don't exist in the current list
+      const existingTitles = new Set(projects.value.map(p => p.title));
+      const newProjects = data.filter(p => !existingTitles.has(p.title));
+      projects.value = [...projects.value, ...newProjects];
     }
   } catch (error) {
     console.error('Error updating projects:', error);
