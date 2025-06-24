@@ -164,8 +164,8 @@
                   <strong class="request-desc">Requested to join Web App Development</strong>
                 </div>
                 <div class="action-button">
-                  <button class="btn btn-accept">Accept</button>
-                  <button class="btn btn-reject">Reject</button>
+                  <button class="btn btn-accept" @click="(e) => handleRequest('accept', userName, courseTitle, e.target)">Accept</button>
+                  <button class="btn btn-accept" @click="(e) => handleRequest('accept', userName, courseTitle, e.target)">Reject</button>
                 </div>
               </div>
             </div>
@@ -177,8 +177,8 @@
                   <strong class="request-desc">Requested to join Mobile App Design</strong>
                 </div>
                 <div class="action-button">
-                  <button class="btn btn-accept">Accept</button>
-                  <button class="btn btn-reject">Reject</button>
+                  <button class="btn btn-accept" @click="(e) => handleRequest('accept', userName, courseTitle, e.target)">Accept</button>
+                  <button class="btn btn-accept" @click="(e) => handleRequest('accept', userName, courseTitle, e.target)">Reject</button>
                 </div>
               </div>
             </div>
@@ -194,7 +194,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'; 
+import { ref, onMounted } from 'vue'; 
 
 const cloudfrontUrl = 'https://d19rfzvlyb1g0k.cloudfront.net/';
 const API_URL = 'https://7f7w0zcocc.execute-api.us-east-1.amazonaws.com/create2/createProject'; 
