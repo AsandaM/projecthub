@@ -75,12 +75,7 @@
               <label for="projectDeadline" class="form-label">Deadline</label>
               <input type="date" class="form-control" id="projectDeadline">
             </div>
-            <div class="mb-3">
-              <label for="projectBudget" class="form-label">Budget (Optional)</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
-                <input type="number" class="form-control" id="projectBudget" placeholder="e.g., 5000">
-              </div>
+
             </div>
 
             <div class="mb-3">
